@@ -1,0 +1,26 @@
+﻿using Core;
+using Newtonsoft.Json;
+using WebApiNET.Utilities;
+
+namespace NavigationApp.Models
+{
+    public class Floor:ObservableObject
+    {
+        [JsonProperty("id")]
+        public int Id { get; set; }
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("map_image")]
+        public string Image { get; set; }
+
+        [JsonIgnore]
+        public DisposableImage DisposableImage
+        {
+            get => GetOrCreate<DisposableImage>();
+            set => SetAndNotify(value);
+        } 
+
+    }
+}

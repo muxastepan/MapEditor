@@ -1,0 +1,1 @@
+[{"id":1,"name":"1","map_image":"http://127.0.0.1:8000/media/maps/1_%D1%8D%D1%82%D0%B0%D0%B6_4_YlsX1EM.png"},{"id":2,"name":"2","map_image":"http://127.0.0.1:8000/media/maps/2_%D1%8D%D1%82%D0%B0%D0%B6_1_tNVsEvm.png"}]

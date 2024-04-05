@@ -1,0 +1,278 @@
+﻿<Window x:Class="MapEditor.Views.Windows.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MapEditor"
+        xmlns:controls="clr-namespace:MapEditor.Views.Controls"
+        xmlns:viewModels="clr-namespace:MapEditor.ViewModels"
+        xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:models="clr-namespace:NavigationApp.Models"
+        xmlns:utilities="clr-namespace:MapEditor.Utilities"
+        xmlns:converters="clr-namespace:MapEditor.Converters"
+        xmlns:models1="clr-namespace:NavigationApp.Models;assembly=WebApiNET"
+        mc:Ignorable="d"
+        ResizeMode="NoResize"
+        WindowState="Maximized">
+    <Window.DataContext>
+        <viewModels:MainWindowViewModel/>
+    </Window.DataContext>
+    <Window.Resources>
+
+        <Style TargetType="RadioButton" x:Key="ToolRadioButtonStyle">
+            <Setter Property="Template" Value="{StaticResource ToolRadioButtonTemplate}"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="GroupName" Value="Tools"/>
+            <Setter Property="Command" Value="{Binding SelectToolCommand}"/>
+            <Style.Triggers>
+                <DataTrigger Value="True">
+                    <DataTrigger.Binding>
+                        <MultiBinding Converter="{StaticResource EqualsConverter}">
+                            <Binding Path="SelectedTool"/>
+                            <Binding RelativeSource="{RelativeSource Self}"
+                                     Path="CommandParameter"/>
+                        </MultiBinding>
+                    </DataTrigger.Binding>
+                    <Setter Property="IsChecked" Value="True"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <DataTemplate DataType="{x:Type models:VisualNode}">
+            <CheckBox
+                Template="{StaticResource NodeButtonTemplate}"
+                Width="{Binding Width}"
+                Height="{Binding Height}"
+                Panel.ZIndex="1000"
+                IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                Visibility="{Binding IsVisible,Converter={StaticResource BooleanToVisibilityConverter}}">
+                <b:Interaction.Triggers>
+
+                    <b:KeyTrigger Key="Delete">
+                        <b:InvokeCommandAction
+                    Command="{Binding DataContext.DeleteMapElementCommand,
+                    RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"/>
+                    </b:KeyTrigger>
+                    <utilities:DisableRoutingEventTrigger EventName="PreviewMouseDown">
+                        <b:InvokeCommandAction
+                            Command="{Binding DataContext.DragCommand,RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                            PassEventArgsToCommand="True"/>
+                    </utilities:DisableRoutingEventTrigger>
+                    <b:EventTrigger EventName="Checked">
+                        <b:InvokeCommandAction
+                            Command="{Binding DataContext.LinkNodesCommand,
+                            RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                            CommandParameter="{Binding}"/>
+                        <b:InvokeCommandAction
+                            Command="{Binding DataContext.MakeRouteCommand,
+                            RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"/>
+
+                    </b:EventTrigger>
+                </b:Interaction.Triggers>
+            </CheckBox>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type models:Link}">
+            <Line
+                    Stroke="Black"
+                    StrokeThickness="3"
+                    Name="Line"
+                    Visibility="{Binding IsVisible,Converter={StaticResource BooleanToVisibilityConverter}}"
+                    X1="{Binding From.VisualCoordinates.X}"
+                    Y1="{Binding From.VisualCoordinates.Y}"
+                    X2="{Binding To.VisualCoordinates.X}"
+                    Y2="{Binding To.VisualCoordinates.Y}"/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type models1:Area}">
+            <Grid>
+                <ItemsControl ItemsSource="{Binding NaviPoints}"
+                      Panel.ZIndex="1">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="Canvas.Left" Value="{Binding X}"/>
+                            <Setter Property="Canvas.Top" Value="{Binding Y}"/>
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button
+                        Width="50"
+                        Height="50"
+                        Name="PointButton"
+                        Visibility="{Binding DataContext.IsEditing,
+                        RelativeSource={RelativeSource FindAncestor, AncestorType=Grid},
+                        Converter={StaticResource BooleanToVisibilityConverter}}"
+                        Command="{Binding DataContext.FinishAreaCommand,RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}">
+                                <b:Interaction.Triggers>
+                                    <utilities:DisableRoutingEventTrigger EventName="PreviewMouseDown">
+                                        <b:InvokeCommandAction
+                                            Command="{Binding DataContext.DragCommand,RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                            PassEventArgsToCommand="True"/>
+                                    </utilities:DisableRoutingEventTrigger>
+                                </b:Interaction.Triggers>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <CheckBox
+            Visibility="{Binding IsVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+            IsChecked="{Binding IsSelected, 
+            Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+            Template="{StaticResource AreaButtonTemplate}"
+            Content="{Binding NaviPoints,Converter={StaticResource PointConverter}}">
+                    <b:Interaction.Triggers>
+                        <b:KeyTrigger Key="Delete">
+                            <b:InvokeCommandAction
+                    Command="{Binding DataContext.DeleteMapElementCommand,
+                    RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                    CommandParameter="{Binding}"/>
+                        </b:KeyTrigger>
+                    </b:Interaction.Triggers>
+                    <CheckBox.Style>
+                        <Style TargetType="CheckBox">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsEditing}" Value="True">
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding DataContext.SelectedTool,RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}" 
+                                             Value="{x:Static viewModels:ToolType.Point}">
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding DataContext.SelectedTool,RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}" 
+                                             Value="{x:Static viewModels:ToolType.Route}">
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding DataContext.SelectedTool,RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}" 
+                                             Value="{x:Static viewModels:ToolType.Hand}">
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </CheckBox.Style>
+                </CheckBox>
+            </Grid>
+        </DataTemplate>
+    </Window.Resources>
+
+    <b:Interaction.Triggers>
+        <b:EventTrigger EventName="Loaded">
+            <b:InvokeCommandAction Command="{Binding OnLoaded}"
+                                   CommandParameter="{Binding ElementName=NodesItemsControl}"/>
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
+
+    <Grid>
+        <Border Background="LightGray"
+                Width="300"
+                CornerRadius="10"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Right"
+                Panel.ZIndex="10"
+                Margin="10">
+            <StackPanel
+                Margin="10">
+                <Button Content="Настройки"
+                    Height="50"/>
+                <TextBlock Text="Инструменты"
+                       FontSize="32"
+                       HorizontalAlignment="Center"/>
+                <UniformGrid
+                    Rows="2">
+                    <RadioButton Content="Курсор"
+                                 Style="{StaticResource ToolRadioButtonStyle}"
+                                 CommandParameter="{x:Static viewModels:ToolType.Cursor}"/>
+                    <RadioButton Content="Рука"
+                                 Style="{StaticResource ToolRadioButtonStyle}"
+                                 CommandParameter="{x:Static viewModels:ToolType.Hand}"/>
+                    <RadioButton Content="Точка"
+                                 Style="{StaticResource ToolRadioButtonStyle}"
+                                 CommandParameter="{x:Static viewModels:ToolType.Point}"/>
+                    <RadioButton Content="Область"
+                                 Style="{StaticResource ToolRadioButtonStyle}"
+                                 CommandParameter="{x:Static viewModels:ToolType.Area}"/>
+                    <RadioButton Content="Маршрут"
+                                 Style="{StaticResource ToolRadioButtonStyle}"
+                                 CommandParameter="{x:Static viewModels:ToolType.Route}"/>
+                </UniformGrid>
+                <TextBlock Text="Этаж"
+                           FontSize="32"
+                           HorizontalAlignment="Center"/>
+                <ComboBox
+                    ItemsSource="{Binding Floors}"
+                    SelectedItem="{Binding SelectedFloor,
+                    Mode=TwoWay}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
+        </Border>
+        <controls:ZoomBorder
+            Width="{Binding SelectedFloor.DisposableImage.Source.Width}"
+            Height="{Binding SelectedFloor.DisposableImage.Source.Height}">
+            <Grid>
+                <b:Interaction.Triggers>
+                    <b:EventTrigger
+                        EventName="MouseLeftButtonDown">
+                        <b:InvokeCommandAction
+                            Command="{Binding CreateMapElementCommand}"
+                            PassEventArgsToCommand="True"/>
+                    </b:EventTrigger>
+                </b:Interaction.Triggers>
+                <Image Source="{Binding SelectedFloor.DisposableImage.Source}"
+                       Stretch="None"/>
+                
+                <ItemsControl ItemsSource="{Binding Nodes}"
+                              Panel.ZIndex="1"
+                              x:Name="NodesItemsControl">
+                    
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="Canvas.Left" Value="{Binding Node.Point.X}"/>
+                            <Setter Property="Canvas.Top" Value="{Binding Node.Point.Y}"/>
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                    <ItemsControl.Style>
+                        <Style TargetType="ItemsControl">
+                        </Style>
+                    </ItemsControl.Style>
+                </ItemsControl>
+
+                <ItemsControl ItemsSource="{Binding Links}"
+                              Background="Transparent">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Grid/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+
+                <ItemsControl ItemsSource="{Binding Areas}"
+                              >
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+
+                <Polyline Stroke="Orange"
+                          StrokeThickness="10"
+                          Points="{Binding FloorRoute,Converter={StaticResource PointConverter}}"/>
+            </Grid>
+        </controls:ZoomBorder>
+    </Grid>
+</Window>
