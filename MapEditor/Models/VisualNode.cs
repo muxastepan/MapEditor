@@ -12,10 +12,24 @@ namespace NavigationApp.Models
     {
 
         public Node Node { get; set; }
-        public double Width { get; set; }
-        public double Height { get; set; }
 
-        
+        public double Width
+        {
+            get=>GetOrCreate<double>(); 
+            set=>SetAndNotify(value);
+        }
+        public double Height 
+        {
+            get => GetOrCreate<double>();
+            set => SetAndNotify(value);
+        }
+
+
+        public string LinkedFloor
+        {
+            get => GetOrCreate<string>();
+            set => SetAndNotify(value);
+        }
 
         public Point VisualCoordinates
         {

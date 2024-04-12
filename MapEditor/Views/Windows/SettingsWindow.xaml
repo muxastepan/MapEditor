@@ -1,0 +1,45 @@
+﻿<Window x:Class="MapEditor.Views.Windows.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MapEditor.Views.Windows"
+        xmlns:viewModels="clr-namespace:MapEditor.ViewModels"
+        mc:Ignorable="d"
+        Title="Настройки" Height="400" Width="400"
+        WindowStartupLocation="CenterScreen">
+    <Window.DataContext>
+        <viewModels:SettingsWindowViewModel/>
+    </Window.DataContext>
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="Margin" Value="0 10 0 10"/>
+            <Setter Property="FontSize" Value="20"/>
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="FontSize" Value="16"/>
+        </Style>
+    </Window.Resources>
+    <StackPanel
+        Margin="10">
+
+        <TextBlock Text="Ссылка на API"/>
+        <TextBox Text="{Binding Settings.ApiUrl,Mode=TwoWay}"/>
+
+        <TextBlock Text="Ширина точки"/>
+        <TextBox Text="{Binding Settings.PointWidth,Mode=TwoWay}"/>
+
+        <TextBlock Text="Высота точки"/>
+        <TextBox Text="{Binding Settings.PointHeight,Mode=TwoWay}"/>
+
+        <TextBlock Text="Толщина линии"/>
+        <TextBox Text="{Binding Settings.LinkThickness,Mode=TwoWay}"/>
+
+        <Button Content="Сохранить и выйти"
+                Margin="0 20 0 0"
+                FontSize="20"
+                Command="{Binding CloseCommand}"
+                CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}"/>
+    </StackPanel>
+</Window>

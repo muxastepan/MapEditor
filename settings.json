@@ -1,0 +1,6 @@
+{
+  "ApiUrl": "http://127.0.0.1:8000",
+  "PointWidth": 100.0,
+  "PointHeight": 100.0,
+  "LinkThickness": 10.0
+}

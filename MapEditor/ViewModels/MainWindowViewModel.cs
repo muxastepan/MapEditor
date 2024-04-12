@@ -9,7 +9,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using MapEditor.Helpers;
 using MapEditor.Views.Controls;
+using MapEditor.Views.Windows;
 using WebApiNET;
 using WebApiNET.Utilities;
 
@@ -29,7 +31,21 @@ namespace MapEditor.ViewModels
         public MainWindowViewModel()
         {
             Areas.CollectionChanged += Areas_CollectionChanged;
+            Links.CollectionChanged += Links_CollectionChanged;
+            Settings = _settingsManager.Read();
+            WebApi.Host = Settings.ApiUrl;
             LoadResources();
+        }
+
+        private readonly SettingsManager _settingsManager = new("settings.json");
+
+        #region Properties
+
+
+        public Settings Settings
+        {
+            get=>GetOrCreate<Settings>(); 
+            set=>SetAndNotify(value);
         }
 
         public ItemsControl MainItemsControl
@@ -98,9 +114,17 @@ namespace MapEditor.ViewModels
             set => SetAndNotify(value);
         }
 
+        #endregion
+
+        #region PropertyChangedHandlers
         private void Areas_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             OnPropertyChanged(nameof(Areas));
+        }
+
+        private void Links_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(Links));
         }
 
         private void SelectedToolChanged(PropertyChangingArgs<ToolType> args)
@@ -124,13 +148,15 @@ namespace MapEditor.ViewModels
         {
             FilterMapElementsByFloor();
         }
+        #endregion
 
+        #region Methods
         private async void LoadResources()
         {
-            
+            await GetFloors();
             await GetAreas();
             await GetNodes();
-            await GetFloors();
+            if (Floors?.Count > 0) SelectedFloor = Floors[0];
         }
 
         private async Task GetFloors()
@@ -140,7 +166,6 @@ namespace MapEditor.ViewModels
             {
                 floor.DisposableImage = new DisposableImage(await WebApi.DownloadIFile(floor.Image, uriKind: UriKind.Absolute));
             }
-            if (Floors?.Count > 0) SelectedFloor = Floors[0];
         }
 
         private async Task GetAreas()
@@ -157,10 +182,10 @@ namespace MapEditor.ViewModels
                 node.GetNeighbors(nodes);
                 Nodes.Add(new VisualNode
                 {
-                    Height = 100,
-                    Width = 100,
+                    Height = Settings.PointHeight,
+                    Width = Settings.PointWidth,
                     Node = node,
-                    VisualCoordinates = new Point(node.Point.X + 50, node.Point.Y + 50)
+                    VisualCoordinates = new Point(node.Point.X + Settings.PointWidth/2, node.Point.Y + Settings.PointHeight/2)
                 });
             }
 
@@ -201,21 +226,25 @@ namespace MapEditor.ViewModels
                 From = firstNode,
                 To = secondNode,
             });
+            if (firstNode.Node.Point.Floor == secondNode.Node.Point.Floor) return;
+
+            firstNode.LinkedFloor = Floors.FirstOrDefault(floor => floor.Id == secondNode.Node.Point.Floor).Name;
+            secondNode.LinkedFloor = Floors.FirstOrDefault(floor => floor.Id == firstNode.Node.Point.Floor).Name;
         }
 
         private async Task CreateNode(Point position)
         {
             var newNode = new VisualNode
             {
-                Height = 100,
-                Width = 100,
+                Height = Settings.PointHeight,
+                Width = Settings.PointWidth,
                 Node = new Node
                 {
                     Point = new NaviPoint
                     {
                         Floor = SelectedFloor.Id,
-                        X = position.X - 50,
-                        Y = position.Y - 50
+                        X = position.X - Settings.PointWidth/2,
+                        Y = position.Y - Settings.PointHeight/2
                     }
                 },
                 VisualCoordinates = position
@@ -245,14 +274,41 @@ namespace MapEditor.ViewModels
             });
         }
 
+        private async Task DeleteNode(VisualNode node)
+        {
+            Nodes.Remove(node);
+            Links = new ObservableCollection<Link>(Links.Where(link => link.From != node && link.To != node));
+            await WebApi.DeleteData<Node>(node.Node.Id.ToString());
+        }
+
+        private async Task DeleteArea(Area area)
+        {
+            Areas.Remove(area);
+            await WebApi.DeleteData<Area>(area.Id.ToString());
+        }
+
+        private async Task DeleteLink(Link link)
+        {
+            Links.Remove(link);
+            var from = link.From.Node;
+            var to = link.To.Node;
+
+            from.Neighbors.Remove(to);
+            to.Neighbors.Remove(from);
+
+            from.NeighborsKeys.Remove(to.Id);
+            to.NeighborsKeys.Remove(from.Id);
+
+            await WebApi.UpdateData<Node>(from,from.Id.ToString());
+            await WebApi.UpdateData<Node>(to, to.Id.ToString());
+        }
+
         private async Task DeleteSelectedNodes()
         {
             var selectedNodes = Nodes.Where(node => node.IsSelected).ToList();
             foreach (var visualNode in selectedNodes)
             {
-                Nodes.Remove(visualNode);
-                Links = new ObservableCollection<Link>(Links.Where(link => link.From != visualNode && link.To != visualNode));
-                await WebApi.DeleteData<Node>(visualNode.Node.Id.ToString());
+                await DeleteNode(visualNode);
             }
         }
 
@@ -261,12 +317,21 @@ namespace MapEditor.ViewModels
             var selectedAreas = Areas.Where(area => area.IsSelected).ToList();
             foreach (var selectedArea in selectedAreas)
             {
-                Areas.Remove(selectedArea);
-                await WebApi.DeleteData<Area>(selectedArea.Id.ToString());
+                await DeleteArea(selectedArea);
             }
         }
-        
 
+        private async Task DeleteSelectedLinks()
+        {
+            var selectedLinks = Links.Where(link => link.IsSelected).ToList();
+            foreach (var selectedLink in selectedLinks)
+            {
+                await DeleteLink(selectedLink);
+            }
+        }
+        #endregion
+
+        #region Commands
         private ICommand? _selectToolCommand;
 
         public ICommand SelectToolCommand => _selectToolCommand ??= new RelayCommand(async f =>
@@ -301,6 +366,7 @@ namespace MapEditor.ViewModels
             switch (SelectedTool)
             {
                 case ToolType.Point:
+                    await DeleteSelectedLinks();
                     await DeleteSelectedNodes();
                     break;
                 case ToolType.Area:
@@ -308,8 +374,10 @@ namespace MapEditor.ViewModels
                     if (f is NaviPoint np) CreatingArea.NaviPoints.Remove(np);
                     break;
                 case ToolType.Cursor:
+                    await DeleteSelectedLinks();
                     await DeleteSelectedNodes();
                     await DeleteSelectedAreas();
+                    
                     break;
                 default:
                     return;
@@ -385,8 +453,8 @@ namespace MapEditor.ViewModels
                 switch (DraggingElement)
                 {
                     case VisualNode vn:
-                        vn.Node.Point.X = pos.X - 50;
-                        vn.Node.Point.Y = pos.Y - 50;
+                        vn.Node.Point.X = pos.X - Settings.PointWidth/2;
+                        vn.Node.Point.Y = pos.Y - Settings.PointHeight/2;
                         vn.VisualCoordinates = pos;
                         break;
                     case NaviPoint np:
@@ -428,8 +496,8 @@ namespace MapEditor.ViewModels
             var points = await WebApi.GetData<ObservableCollection<NaviPoint>>($"?from={selectedNodes.First().Node.Id}&to={selectedNodes.Last().Node.Id}");
             foreach (var point in points)
             {
-                point.X += 50;
-                point.Y += 50;
+                point.X += Settings.PointWidth/2;
+                point.Y += Settings.PointHeight/2;
             }
             Route = points;
             FloorRoute = new ObservableCollection<NaviPoint>(points.Where(point => point.Floor == SelectedFloor.Id));
@@ -441,5 +509,28 @@ namespace MapEditor.ViewModels
         {
             if(f is ItemsControl mainItemsControl) MainItemsControl = mainItemsControl;
         });
+
+        private ICommand? _openSettingsCommand;
+
+        public ICommand OpenSettingsCommand => _openSettingsCommand ??= new RelayCommand(f =>
+        {
+            var settingsWindow = new SettingsWindow
+                { DataContext = new SettingsWindowViewModel { Settings = Settings } };
+            settingsWindow.Closed += SettingsWindow_Closed;
+            settingsWindow.Show();
+        });
+
+        private void SettingsWindow_Closed(object? sender, EventArgs e)
+        {
+            _settingsManager.Write(Settings);
+            foreach (var visualNode in Nodes)
+            {
+                visualNode.Height = Settings.PointHeight;
+                visualNode.Width = Settings.PointWidth;
+                visualNode.VisualCoordinates = new Point(visualNode.Node.Point.X + Settings.PointWidth/2, visualNode.Node.Point.Y+Settings.PointHeight/2);
+            }
+        }
+
+        #endregion
     }
 }

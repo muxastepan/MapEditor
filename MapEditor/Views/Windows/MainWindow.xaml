@@ -13,7 +13,8 @@
         xmlns:models1="clr-namespace:NavigationApp.Models;assembly=WebApiNET"
         mc:Ignorable="d"
         ResizeMode="NoResize"
-        WindowState="Maximized">
+        WindowState="Maximized"
+        Title="MapEditor">
     <Window.DataContext>
         <viewModels:MainWindowViewModel/>
     </Window.DataContext>
@@ -45,7 +46,8 @@
                 Height="{Binding Height}"
                 Panel.ZIndex="1000"
                 IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                Visibility="{Binding IsVisible,Converter={StaticResource BooleanToVisibilityConverter}}">
+                Visibility="{Binding IsVisible,Converter={StaticResource BooleanToVisibilityConverter}}"
+                Content="{Binding LinkedFloor}">
                 <b:Interaction.Triggers>
 
                     <b:KeyTrigger Key="Delete">
@@ -73,15 +75,35 @@
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type models:Link}">
-            <Line
-                    Stroke="Black"
-                    StrokeThickness="3"
-                    Name="Line"
-                    Visibility="{Binding IsVisible,Converter={StaticResource BooleanToVisibilityConverter}}"
-                    X1="{Binding From.VisualCoordinates.X}"
-                    Y1="{Binding From.VisualCoordinates.Y}"
-                    X2="{Binding To.VisualCoordinates.X}"
-                    Y2="{Binding To.VisualCoordinates.Y}"/>
+            <CheckBox
+                IsChecked="{Binding IsSelected,Mode=TwoWay}"
+                Visibility="{Binding IsVisible,Converter={StaticResource BooleanToVisibilityConverter}}">
+                <CheckBox.Template>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Line
+                            Stroke="Black"
+                            StrokeThickness="{Binding DataContext.Settings.LinkThickness,
+                            RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}"
+                            Name="Line"
+                            X1="{Binding From.VisualCoordinates.X}"
+                            Y1="{Binding From.VisualCoordinates.Y}"
+                            X2="{Binding To.VisualCoordinates.X}"
+                            Y2="{Binding To.VisualCoordinates.Y}"/>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Line" Property="Stroke" Value="Orange"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </CheckBox.Template>
+                <b:Interaction.Triggers>
+                    <b:KeyTrigger Key="Delete">
+                        <b:InvokeCommandAction
+                            Command="{Binding DataContext.DeleteMapElementCommand,
+    RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"/>
+                    </b:KeyTrigger>
+                </b:Interaction.Triggers>
+            </CheckBox>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type models1:Area}">
@@ -102,8 +124,8 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Button
-                        Width="50"
-                        Height="50"
+                        Width="{Binding DataContext.Settings.PointWidth,RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}"
+                        Height="{Binding DataContext.Settings.PointHeight,RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}"
                         Name="PointButton"
                         Visibility="{Binding DataContext.IsEditing,
                         RelativeSource={RelativeSource FindAncestor, AncestorType=Grid},
@@ -178,7 +200,8 @@
             <StackPanel
                 Margin="10">
                 <Button Content="Настройки"
-                    Height="50"/>
+                        Command="{Binding OpenSettingsCommand}"
+                        Height="50"/>
                 <TextBlock Text="Инструменты"
                        FontSize="32"
                        HorizontalAlignment="Center"/>
@@ -231,7 +254,7 @@
                        Stretch="None"/>
                 
                 <ItemsControl ItemsSource="{Binding Nodes}"
-                              Panel.ZIndex="1"
+                              Panel.ZIndex="2"
                               x:Name="NodesItemsControl">
                     
                     <ItemsControl.ItemsPanel>
@@ -252,7 +275,7 @@
                 </ItemsControl>
 
                 <ItemsControl ItemsSource="{Binding Links}"
-                              Background="Transparent">
+                              Panel.ZIndex="1">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Grid/>

@@ -21,11 +21,17 @@
 
     <ControlTemplate TargetType="CheckBox"
                      x:Key="NodeButtonTemplate">
-        <Ellipse
+        <Grid>
+            <Ellipse
             Name ="Ellipse"
             Stroke="Black"
             Fill="White"
             StrokeThickness="1"/>
+            <TextBlock Text="{TemplateBinding Content}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="40"/>
+        </Grid>
         <ControlTemplate.Triggers>
             <Trigger Property="IsChecked" Value="True">
                 <Setter TargetName="Ellipse" Property="Fill" Value="Orange"/>
@@ -45,7 +51,7 @@
             <Trigger Property="IsChecked" Value="True">
                 <Setter TargetName="Polygon" Property="Fill" Value="Orange"/>
             </Trigger>
-            
+
         </ControlTemplate.Triggers>
 
     </ControlTemplate>
