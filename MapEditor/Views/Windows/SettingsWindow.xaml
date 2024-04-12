@@ -5,6 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MapEditor.Views.Windows"
         xmlns:viewModels="clr-namespace:MapEditor.ViewModels"
+        xmlns:settings="clr-namespace:MapEditor.Models.Settings"
+        xmlns:models="clr-namespace:MapEditor.Models"
         mc:Ignorable="d"
         Title="Настройки" Height="400" Width="400"
         WindowStartupLocation="CenterScreen">
@@ -14,32 +16,130 @@
     <Window.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="Margin" Value="0 10 0 10"/>
-            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontSize" Value="16"/>
         </Style>
 
         <Style TargetType="TextBox">
             <Setter Property="FontSize" Value="16"/>
         </Style>
+
+        <!--<DataTemplate DataType="{x:Type models:BaseField}">
+            
+        </DataTemplate>-->
+
+        <DataTemplate DataType="{x:Type models:BusinessObject}">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Относительный URL"
+                               Margin="10"/>
+                    <TextBox Text="{Binding Url,Mode=TwoWay}"
+                             MinWidth="80"
+                             Margin="10"/>
+                    <Button Content="Добавить поле"
+                            HorizontalAlignment="Right"
+                        Command="{Binding DataContext.AddFieldCommand,RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}"
+                        CommandParameter="{Binding}"/>
+                </StackPanel>
+                <ItemsControl ItemsSource="{Binding Fields.Keys}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+
+                            <StackPanel>
+                                <TextBlock Text="Имя поля в API"/>
+                                <TextBox Text="{Binding Mode=TwoWay}"/>
+                            </StackPanel>
+
+
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type settings:VisualSettings}">
+            <UniformGrid
+                Rows="3">
+                <StackPanel
+                    Margin="10">
+                    <TextBlock Text="Ширина точки на карте"/>
+                    <TextBox Text="{Binding NodePointWidth,Mode=TwoWay}"/>
+                </StackPanel>
+
+                <StackPanel
+                    Margin="10">
+                    <TextBlock Text="Высота точки на карте"/>
+                    <TextBox Text="{Binding NodePointHeight,Mode=TwoWay}"/>
+                </StackPanel>
+
+                <StackPanel
+                    Margin="10">
+                    <TextBlock Text="Ширина точки области"/>
+                    <TextBox Text="{Binding AreaPointWidth,Mode=TwoWay}"/>
+                </StackPanel>
+
+                <StackPanel
+                    Margin="10">
+                    <TextBlock Text="Высота точки области"/>
+                    <TextBox Text="{Binding AreaPointHeight,Mode=TwoWay}"/>
+                </StackPanel>
+
+                <StackPanel
+                    Margin="10">
+                    <TextBlock Text="Толщина линии связи"/>
+                    <TextBox Text="{Binding LinkThickness,Mode=TwoWay}"/>
+                </StackPanel>
+            </UniformGrid>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type settings:NetworkSettings}">
+            <StackPanel>
+
+                <TextBlock Text="Ссылка на API"
+                           Margin="10"/>
+                <TextBox Text="{Binding ApiUrl,Mode=TwoWay}"
+                         Margin="10"/>
+
+                <TextBlock Text="Ссылка на навигационный сервис"
+                           Margin="10"/>
+                <TextBox Text="{Binding NaviUrl,Mode=TwoWay}"
+                         Margin="10"/>
+
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type settings:BusinessObjectsSettings}">
+            <StackPanel>
+                <ListBox ItemsSource="{Binding BusinessObjects}"
+                         SelectedItem="{Binding DataContext.SelectedBusinessObject,RelativeSource={RelativeSource FindAncestor,AncestorType=Window},Mode=TwoWay}"/>
+                <Button Content="Добавить объект"
+                        Margin="0 20 0 0"
+                        FontSize="20"
+                        Command="{Binding DataContext.AddBusinessObjectCommand,RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}"/>
+
+                <Button Content="Удалить объект"
+                        Margin="0 10 0 0"
+                        FontSize="20"
+                        Command="{Binding DataContext.DeleteBusinessObjectCommand,RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}"/>
+            </StackPanel>
+        </DataTemplate>
     </Window.Resources>
-    <StackPanel
-        Margin="10">
-
-        <TextBlock Text="Ссылка на API"/>
-        <TextBox Text="{Binding Settings.ApiUrl,Mode=TwoWay}"/>
-
-        <TextBlock Text="Ширина точки"/>
-        <TextBox Text="{Binding Settings.PointWidth,Mode=TwoWay}"/>
-
-        <TextBlock Text="Высота точки"/>
-        <TextBox Text="{Binding Settings.PointHeight,Mode=TwoWay}"/>
-
-        <TextBlock Text="Толщина линии"/>
-        <TextBox Text="{Binding Settings.LinkThickness,Mode=TwoWay}"/>
-
+    <StackPanel>
+        <TabControl>
+            <TabControl.Items>
+                <TabItem
+                Content="{Binding Settings.NetworkSettings}"
+                Header="Сеть"/>
+                <TabItem Header="Вид"
+                     Content="{Binding Settings.VisualSettings}"/>
+                <TabItem Header="Объекты"
+                     Content="{Binding Settings.BusinessObjectsSettings}">
+                </TabItem>
+            </TabControl.Items>
+        </TabControl>
         <Button Content="Сохранить и выйти"
-                Margin="0 20 0 0"
-                FontSize="20"
-                Command="{Binding CloseCommand}"
-                CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}"/>
+            Margin="0 20 0 0"
+            FontSize="20"
+            Command="{Binding CloseCommand}"
+            CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}"/>
     </StackPanel>
 </Window>

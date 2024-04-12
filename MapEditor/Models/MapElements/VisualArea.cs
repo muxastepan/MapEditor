@@ -15,6 +15,17 @@ namespace MapEditor.Models.MapElements
             set => SetAndNotify(value);
         }
 
+        public double PointWidth
+        {
+            get => GetOrCreate<double>();
+            set => SetAndNotify(value);
+        }
+
+        public double PointHeight
+        {
+            get=>GetOrCreate<double>();
+            set => SetAndNotify(value);
+        }
 
         public override async Task Delete()
         {

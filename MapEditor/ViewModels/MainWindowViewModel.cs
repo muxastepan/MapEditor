@@ -12,6 +12,7 @@ using System.Windows.Input;
 using MapEditor.Helpers;
 using MapEditor.Models.MapElements;
 using MapEditor.Models.MapElements.Factories;
+using MapEditor.Models.Settings;
 using MapEditor.Views.Controls;
 using MapEditor.Views.Windows;
 using WebApiNET;
@@ -35,7 +36,7 @@ namespace MapEditor.ViewModels
             Areas.CollectionChanged += Areas_CollectionChanged;
             Links.CollectionChanged += Links_CollectionChanged;
             Settings = _settingsManager.Read();
-            WebApi.Host = Settings.ApiUrl;
+            WebApi.Host = Settings.NetworkSettings.NaviUrl;
             LoadResources();
         }
 
@@ -191,10 +192,10 @@ namespace MapEditor.ViewModels
                 node.GetNeighbors(nodes);
                 Nodes.Add(new VisualNode
                 {
-                    Height = Settings.PointHeight,
-                    Width = Settings.PointWidth,
+                    Height = Settings.VisualSettings.NodePointHeight,
+                    Width = Settings.VisualSettings.NodePointWidth,
                     Node = node,
-                    VisualCoordinates = new Point(node.Point.X + Settings.PointWidth/2, node.Point.Y + Settings.PointHeight/2)
+                    VisualCoordinates = new Point(node.Point.X + Settings.VisualSettings.NodePointWidth /2, node.Point.Y + Settings.VisualSettings.NodePointHeight /2)
                 });
             }
 
@@ -236,7 +237,7 @@ namespace MapEditor.ViewModels
         private async Task<MapElement> ExecuteMapElementFactoryCreator<T>(ICollection<T> managingCollection,
             Point position, MapElementFactory factory) where T : MapElement, new()
         {
-            var element = await factory.Create(position, Settings, SelectedFloor);
+            var element = await factory.Create(position, Settings.VisualSettings, SelectedFloor);
             managingCollection.Add(element as T);
             return element;
         }
@@ -293,6 +294,23 @@ namespace MapEditor.ViewModels
 
         }
 
+        private async Task DeleteMapElement(MapElement mapElement)
+        {
+            switch (mapElement)
+            {
+                case VisualNode vn:
+                    Nodes.Remove(vn);
+                    break;
+                case VisualArea va:
+                    Areas.Remove(va);
+                    break;
+                case Link l:
+                    Links.Remove(l);
+                    break;
+            }
+            await mapElement.Delete();
+        }
+
         #endregion
 
         #region Commands
@@ -317,18 +335,41 @@ namespace MapEditor.ViewModels
                 case ToolType.Area:
                     await CreateMapElement(Areas,pos);
                     break;
+                case ToolType.Cursor:
+                case ToolType.Hand:
+                case ToolType.Route:
                 default:
                     return;
             }
             
         });
 
+        private ICommand? _editAreaCommand;
+
+        public ICommand EditAreaCommand => _editAreaCommand ??= new RelayCommand(async f =>
+        {
+            if(f is not VisualArea va) return;
+            if (CreatingArea is null)
+            {
+                CreatingArea = va;
+            }
+            else
+            {
+                await CreatingArea.StopEditing();
+                CreatingArea = va;
+            }
+            CreatingArea.IsEditing = true;
+        });
 
         private ICommand? _deleteMapElementCommand;
 
         public ICommand DeleteMapElementCommand => _deleteMapElementCommand ??= new RelayCommand(async f =>
         {
-            
+            if (f is MapElement me)
+            {
+                await DeleteMapElement(me);
+                return;
+            }
             switch (SelectedTool)
             {
                 case ToolType.Point:
@@ -418,8 +459,8 @@ namespace MapEditor.ViewModels
                 switch (DraggingElement)
                 {
                     case VisualNode vn:
-                        vn.Node.Point.X = pos.X - Settings.PointWidth/2;
-                        vn.Node.Point.Y = pos.Y - Settings.PointHeight/2;
+                        vn.Node.Point.X = pos.X - Settings.VisualSettings.NodePointWidth /2;
+                        vn.Node.Point.Y = pos.Y - Settings.VisualSettings.NodePointHeight /2;
                         vn.VisualCoordinates = pos;
                         break;
                     case NaviPoint np:
@@ -461,8 +502,8 @@ namespace MapEditor.ViewModels
             var points = await WebApi.GetData<ObservableCollection<NaviPoint>>($"?from={selectedNodes.First().Node.Id}&to={selectedNodes.Last().Node.Id}");
             foreach (var point in points)
             {
-                point.X += Settings.PointWidth/2;
-                point.Y += Settings.PointHeight/2;
+                point.X += Settings.VisualSettings.NodePointWidth /2;
+                point.Y += Settings.VisualSettings.NodePointHeight /2;
             }
             Route = points;
             FloorRoute = new ObservableCollection<NaviPoint>(points.Where(point => point.Floor == SelectedFloor.Id));
@@ -490,10 +531,18 @@ namespace MapEditor.ViewModels
             _settingsManager.Write(Settings);
             foreach (var visualNode in Nodes)
             {
-                visualNode.Height = Settings.PointHeight;
-                visualNode.Width = Settings.PointWidth;
-                visualNode.VisualCoordinates = new Point(visualNode.Node.Point.X + Settings.PointWidth/2, visualNode.Node.Point.Y+Settings.PointHeight/2);
+                visualNode.Height = Settings.VisualSettings.NodePointHeight;
+                visualNode.Width = Settings.VisualSettings.NodePointWidth;
+                visualNode.VisualCoordinates = new Point(visualNode.Node.Point.X + Settings.VisualSettings.NodePointWidth /2, visualNode.Node.Point.Y+Settings.VisualSettings.NodePointHeight /2);
             }
+
+            foreach (var visualArea in Areas)
+            {
+                visualArea.PointHeight = Settings.VisualSettings.AreaPointHeight;
+                visualArea.PointWidth = Settings.VisualSettings.AreaPointWidth;
+            }
+
+            WebApi.Host = Settings.NetworkSettings.NaviUrl;
         }
 
         #endregion

@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Input;
 using Core;
 using MapEditor.Models;
+using MapEditor.Models.Settings;
 using MapEditor.Views.Windows;
 
 namespace MapEditor.ViewModels
@@ -19,11 +20,37 @@ namespace MapEditor.ViewModels
             set=>SetAndNotify(value);
         }
 
+        public BusinessObject SelectedBusinessObject
+        {
+            get=>GetOrCreate<BusinessObject>();
+            set=>SetAndNotify(value);
+        }
+
         private ICommand? _closeCommand;
         public ICommand CloseCommand => _closeCommand ??= new RelayCommand(f =>
         {
             if(f is not SettingsWindow sw) return;
             sw.Close();
+        });
+
+        private ICommand? _addFieldCommand;
+
+        public ICommand AddFieldCommand => _addFieldCommand ??= new RelayCommand(f =>
+        {
+            if(f is not BusinessObject bo) return;
+            bo.Fields.Add("example","");
+        });
+
+        private ICommand? _addBusinessObjectCommand;
+        public ICommand AddBusinessObjectCommand => _addBusinessObjectCommand ??= new RelayCommand(f =>
+        {
+            Settings.BusinessObjectsSettings.BusinessObjects.Add(new BusinessObject());
+        });
+
+        private ICommand? _deleteBusinessObjectCommand;
+        public ICommand DeleteBusinessObjectCommand => _deleteBusinessObjectCommand ??= new RelayCommand(f =>
+        {
+            Settings.BusinessObjectsSettings.BusinessObjects.Add(new BusinessObject());
         });
     }
 }

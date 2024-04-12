@@ -5,13 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using MapEditor.Models.Settings;
 using NavigationApp.Models;
 
 namespace MapEditor.Models.MapElements.Factories
 {
     public class VisualAreaFactory:MapElementFactory
     {
-        public override async Task<MapElement> Create(Point position, Settings settings, Floor selectedFloor)
+        public override async Task<MapElement> Create(Point position, VisualSettings settings, Floor selectedFloor)
         {
             
             var creatingArea = new VisualArea
@@ -21,6 +22,8 @@ namespace MapEditor.Models.MapElements.Factories
                     Floor = selectedFloor.Id,
                     
                 },
+                PointWidth = settings.AreaPointWidth,
+                PointHeight = settings.AreaPointHeight,
                 IsEditing = true,
                 IsVisible = true,
             };

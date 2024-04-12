@@ -50,12 +50,14 @@
                 IsChecked="{Binding IsSelected, Mode=TwoWay}"
                 Visibility="{Binding IsVisible,Converter={StaticResource BooleanToVisibilityConverter}}"
                 Content="{Binding LinkedFloor}">
-                <CheckBox.ContextMenu>
+                <!--<CheckBox.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Удалить"
-                                  Command="{Binding}"/>
+                                  Command="{Binding DataContext.DeleteMapElementCommand,
+                            RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                  CommandParameter="{Binding}"/>
                     </ContextMenu>
-                </CheckBox.ContextMenu>
+                </CheckBox.ContextMenu>-->
                 <b:Interaction.Triggers>
 
                     <b:KeyTrigger Key="Delete">
@@ -86,11 +88,19 @@
             <CheckBox
                 IsChecked="{Binding IsSelected,Mode=TwoWay}"
                 Visibility="{Binding IsVisible,Converter={StaticResource BooleanToVisibilityConverter}}">
+                <!--<CheckBox.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Удалить"
+                                  Command="{Binding DataContext.DeleteMapElementCommand,
+                                  RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                  CommandParameter="{Binding}"/>
+                    </ContextMenu>
+                </CheckBox.ContextMenu>-->
                 <CheckBox.Template>
                     <ControlTemplate TargetType="CheckBox">
                         <Line
                             Stroke="Black"
-                            StrokeThickness="{Binding DataContext.Settings.LinkThickness,
+                            StrokeThickness="{Binding DataContext.Settings.VisualSettings.LinkThickness,
                             RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}"
                             Name="Line"
                             X1="{Binding From.VisualCoordinates.X}"
@@ -132,8 +142,8 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Button
-                        Width="{Binding DataContext.Settings.PointWidth,RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}"
-                        Height="{Binding DataContext.Settings.PointHeight,RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}"
+                        Width="{Binding DataContext.PointWidth,RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl}}"
+                        Height="{Binding DataContext.PointHeight,RelativeSource={RelativeSource FindAncestor,AncestorType=ItemsControl}}"
                         Name="PointButton"
                         Visibility="{Binding DataContext.IsEditing,
                         RelativeSource={RelativeSource FindAncestor, AncestorType=Grid},
@@ -156,12 +166,23 @@
             Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
             Template="{StaticResource AreaButtonTemplate}"
             Content="{Binding Area.NaviPoints,Converter={StaticResource PointConverter}}">
+                    <!--<CheckBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Удалить"
+                                      Command="{Binding DataContext.DeleteMapElementCommand,
+                                      RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                      CommandParameter="{Binding}"/>
+                            <MenuItem Header="Редактировать"
+                                      Command="{Binding DataContext.EditAreaCommand,
+                                RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                      CommandParameter="{Binding}"/>
+                        </ContextMenu>
+                    </CheckBox.ContextMenu>-->
                     <b:Interaction.Triggers>
                         <b:KeyTrigger Key="Delete">
                             <b:InvokeCommandAction
                     Command="{Binding DataContext.DeleteMapElementCommand,
-                    RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                    CommandParameter="{Binding}"/>
+                    RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"/>
                         </b:KeyTrigger>
                     </b:Interaction.Triggers>
                     <CheckBox.Style>
