@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using System.Windows;
 using Core;
+using NavigationApp.Models;
 
-namespace MapEditor.Models
+namespace MapEditor.Models.MapElements
 {
-    public class MapElement:ObservableObject
+    public abstract class MapElement:ObservableObject
     {
         public bool IsSelected
         {
@@ -20,6 +18,9 @@ namespace MapEditor.Models
             get => GetOrCreate(true);
             set => SetAndNotify(value);
         }
+
+
+        public abstract Task Delete();
 
     }
 }

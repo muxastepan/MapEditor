@@ -1,12 +1,9 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+﻿using System.Threading.Tasks;
 using System.Windows;
-using Core;
-using MapEditor.Models;
+using NavigationApp.Models;
+using WebApiNET;
 
-
-namespace NavigationApp.Models
+namespace MapEditor.Models.MapElements
 {
     public class VisualNode: MapElement
     {
@@ -35,6 +32,11 @@ namespace NavigationApp.Models
         {
             get => GetOrCreate<Point>();
             set => SetAndNotify(value);
+        }
+
+        public override async Task Delete()
+        {
+            await WebApi.DeleteData<Node>(Node.Id.ToString());
         }
     }
 }

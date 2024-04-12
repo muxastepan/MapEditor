@@ -49,26 +49,5 @@ namespace NavigationApp.Models
 
         [JsonProperty("floor")]
         public int Floor { get; set; }
-
-        [JsonIgnore]
-        public bool IsSelected
-        {
-            get => GetOrCreate<bool>();
-            set => SetAndNotify(value);
-        }
-
-        [JsonIgnore]
-        public bool IsEditing
-        {
-            get => GetOrCreate<bool>();
-            set => SetAndNotify(value);
-        }
-
-        [JsonIgnore]
-        public bool IsVisible
-        {
-            get => GetOrCreate<bool>();
-            set => SetAndNotify(value);
-        }
     }
 }

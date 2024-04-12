@@ -10,6 +10,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using MapEditor.Helpers;
+using MapEditor.Models.MapElements;
+using MapEditor.Models.MapElements.Factories;
 using MapEditor.Views.Controls;
 using MapEditor.Views.Windows;
 using WebApiNET;
@@ -90,15 +92,15 @@ namespace MapEditor.ViewModels
             set => SetAndNotify(value);
         }
 
-        public ObservableCollection<Area> Areas
+        public ObservableCollection<VisualArea> Areas
         {
-            get => GetOrCreate(new ObservableCollection<Area>());
+            get => GetOrCreate(new ObservableCollection<VisualArea>());
             set => SetAndNotify(value);
         }
 
-        public Area? CreatingArea
+        public VisualArea? CreatingArea
         {
-            get => GetOrCreate<Area>();
+            get => GetOrCreate<VisualArea>();
             set => SetAndNotify(value);
         }
 
@@ -170,7 +172,14 @@ namespace MapEditor.ViewModels
 
         private async Task GetAreas()
         {
-            Areas = await WebApi.GetData<ObservableCollection<Area>>();
+            var areas = await WebApi.GetData<ObservableCollection<Area>>();
+            foreach (var area in areas)
+            {
+                Areas.Add(new VisualArea
+                {
+                    Area = area
+                });
+            }
         }
 
         private async Task GetNodes()
@@ -194,7 +203,11 @@ namespace MapEditor.ViewModels
                 if (visualNode.Node.Neighbors.Count == 0) continue;
                 foreach (var node in Nodes.Where(item => visualNode.Node.Neighbors.Contains(item.Node)))
                 {
-                    LinkNodes(visualNode, node);
+                    Links.Add(new Link
+                    {
+                        From = visualNode,
+                        To = node,
+                    });
                 }
             }
         }
@@ -213,122 +226,73 @@ namespace MapEditor.ViewModels
 
             foreach (var area in Areas)
             {
-                area.IsVisible = area.Floor == SelectedFloor.Id;
+                area.IsVisible = area.Area.Floor == SelectedFloor.Id;
             }
 
             FloorRoute = new ObservableCollection<NaviPoint>(Route.Where(point => point.Floor == SelectedFloor.Id));
         }
 
-        private void LinkNodes(VisualNode firstNode, VisualNode secondNode)
-        {
-            Links.Add(new Link
-            {
-                From = firstNode,
-                To = secondNode,
-            });
-            if (firstNode.Node.Point.Floor == secondNode.Node.Point.Floor) return;
 
-            firstNode.LinkedFloor = Floors.FirstOrDefault(floor => floor.Id == secondNode.Node.Point.Floor).Name;
-            secondNode.LinkedFloor = Floors.FirstOrDefault(floor => floor.Id == firstNode.Node.Point.Floor).Name;
+        private async Task<MapElement> ExecuteMapElementFactoryCreator<T>(ICollection<T> managingCollection,
+            Point position, MapElementFactory factory) where T : MapElement, new()
+        {
+            var element = await factory.Create(position, Settings, SelectedFloor);
+            managingCollection.Add(element as T);
+            return element;
         }
 
-        private async Task CreateNode(Point position)
+        private async Task CreateMapElement<T>(ICollection<T> managingCollection,Point position) where T : MapElement, new()
         {
-            var newNode = new VisualNode
+            object obj = new T();
+            switch (obj)
             {
-                Height = Settings.PointHeight,
-                Width = Settings.PointWidth,
-                Node = new Node
-                {
-                    Point = new NaviPoint
+                case VisualNode:
+                    await ExecuteMapElementFactoryCreator(managingCollection, position, new VisualNodeFactory());
+                    break;
+
+                case VisualArea:
+                    if (CreatingArea is null)
                     {
-                        Floor = SelectedFloor.Id,
-                        X = position.X - Settings.PointWidth/2,
-                        Y = position.Y - Settings.PointHeight/2
+                        var va = await ExecuteMapElementFactoryCreator(managingCollection, position, new VisualAreaFactory());
+                        CreatingArea = va as VisualArea;
                     }
-                },
-                VisualCoordinates = position
+                    else
+                    {
+                        CreatingArea.AddPoint(position,SelectedFloor);
+                    }
+                    break;
             };
-            Nodes.Add(newNode);
-            var (response, result) = await WebApi.SendData<Node>(newNode.Node);
-            newNode.Node.Id = result.Id;
         }
 
-        private async Task CreateArea(Point position)
+        private async Task DeleteSelectedMapElements<T>(ICollection<T> managingCollection) where T:MapElement, new()
         {
-            if (CreatingArea is null)
+            var selectedElements = managingCollection.Where(element => element.IsSelected).ToList();
+            foreach (var selectedElement in selectedElements)
             {
-                CreatingArea = new Area
+                managingCollection.Remove(selectedElement);
+                await selectedElement.Delete();
+                if (selectedElement is VisualNode node)
                 {
-                    Floor = SelectedFloor.Id,
-                    IsEditing = true,
-                    IsVisible = true,
-                };
-                Areas.Add(CreatingArea);
+                    await DeleteEmptyLinks(node);
+                }
             }
-            CreatingArea.NaviPoints.Add(new NaviPoint
+
+            
+        }
+
+        private async Task DeleteEmptyLinks(VisualNode? node)
+        {
+            if(node is null) return;
+
+            var emptyLinks = Links.Where(link => link.From==node || link.To==node).ToList();
+            foreach (var emptyLink in emptyLinks)
             {
-                Floor = SelectedFloor.Id,
-                X = position.X,
-                Y = position.Y
-            });
-        }
-
-        private async Task DeleteNode(VisualNode node)
-        {
-            Nodes.Remove(node);
-            Links = new ObservableCollection<Link>(Links.Where(link => link.From != node && link.To != node));
-            await WebApi.DeleteData<Node>(node.Node.Id.ToString());
-        }
-
-        private async Task DeleteArea(Area area)
-        {
-            Areas.Remove(area);
-            await WebApi.DeleteData<Area>(area.Id.ToString());
-        }
-
-        private async Task DeleteLink(Link link)
-        {
-            Links.Remove(link);
-            var from = link.From.Node;
-            var to = link.To.Node;
-
-            from.Neighbors.Remove(to);
-            to.Neighbors.Remove(from);
-
-            from.NeighborsKeys.Remove(to.Id);
-            to.NeighborsKeys.Remove(from.Id);
-
-            await WebApi.UpdateData<Node>(from,from.Id.ToString());
-            await WebApi.UpdateData<Node>(to, to.Id.ToString());
-        }
-
-        private async Task DeleteSelectedNodes()
-        {
-            var selectedNodes = Nodes.Where(node => node.IsSelected).ToList();
-            foreach (var visualNode in selectedNodes)
-            {
-                await DeleteNode(visualNode);
+                Links.Remove(emptyLink);
+                await emptyLink.Delete();
             }
+
         }
 
-        private async Task DeleteSelectedAreas()
-        {
-            var selectedAreas = Areas.Where(area => area.IsSelected).ToList();
-            foreach (var selectedArea in selectedAreas)
-            {
-                await DeleteArea(selectedArea);
-            }
-        }
-
-        private async Task DeleteSelectedLinks()
-        {
-            var selectedLinks = Links.Where(link => link.IsSelected).ToList();
-            foreach (var selectedLink in selectedLinks)
-            {
-                await DeleteLink(selectedLink);
-            }
-        }
         #endregion
 
         #region Commands
@@ -348,10 +312,10 @@ namespace MapEditor.ViewModels
             switch (SelectedTool)
             {
                 case ToolType.Point:
-                    await CreateNode(pos);
+                    await CreateMapElement(Nodes,pos);
                     break;
                 case ToolType.Area:
-                    await CreateArea(pos);
+                    await CreateMapElement(Areas,pos);
                     break;
                 default:
                     return;
@@ -359,32 +323,33 @@ namespace MapEditor.ViewModels
             
         });
 
+
         private ICommand? _deleteMapElementCommand;
 
         public ICommand DeleteMapElementCommand => _deleteMapElementCommand ??= new RelayCommand(async f =>
         {
+            
             switch (SelectedTool)
             {
                 case ToolType.Point:
-                    await DeleteSelectedLinks();
-                    await DeleteSelectedNodes();
+                    await DeleteSelectedMapElements(Links);
+                    await DeleteSelectedMapElements(Nodes);
                     break;
                 case ToolType.Area:
-                    await DeleteSelectedAreas();
-                    if (f is NaviPoint np) CreatingArea.NaviPoints.Remove(np);
+                    await DeleteSelectedMapElements(Areas);
+                    if (f is NaviPoint np) CreatingArea.Area.NaviPoints.Remove(np);
                     break;
                 case ToolType.Cursor:
-                    await DeleteSelectedLinks();
-                    await DeleteSelectedNodes();
-                    await DeleteSelectedAreas();
+                    await DeleteSelectedMapElements(Links);
+                    await DeleteSelectedMapElements(Nodes);
+                    await DeleteSelectedMapElements(Areas);
                     
                     break;
+                case ToolType.Hand:
+                case ToolType.Route:
                 default:
                     return;
             }
-
-
-
         });
 
 
@@ -411,28 +376,28 @@ namespace MapEditor.ViewModels
                 }
             }
 
-            
-
-            firstNode.Node.Neighbors.Add(secondNode.Node);
-            secondNode.Node.Neighbors.Add(firstNode.Node);
-            firstNode.Node.NeighborsKeys.Add(secondNode.Node.Id);
-            secondNode.Node.NeighborsKeys.Add(firstNode.Node.Id);
-
-            await WebApi.UpdateData<Node>(firstNode.Node, firstNode.Node.Id.ToString());
-            await WebApi.UpdateData<Node>(secondNode.Node, secondNode.Node.Id.ToString());
+            await Link.LinkNodes(firstNode, secondNode);
 
             if (Links.Contains(Links.FirstOrDefault(link => link.From == firstNode && link.To == secondNode))) return;
-            LinkNodes(firstNode, secondNode);
+            Links.Add(new Link
+            {
+                From = firstNode,
+                To = secondNode,
+            });
             firstNode.IsSelected = false;
+
+            if (firstNode.Node.Point.Floor == secondNode.Node.Point.Floor) return;
+
+            firstNode.LinkedFloor = Floors.FirstOrDefault(floor => floor.Id == secondNode.Node.Point.Floor).Name;
+            secondNode.LinkedFloor = Floors.FirstOrDefault(floor => floor.Id == firstNode.Node.Point.Floor).Name;
+            
         });
 
         private ICommand? _finishAreaCommand;
 
         public ICommand FinishAreaCommand => _finishAreaCommand ??= new RelayCommand(async f =>
         {
-            CreatingArea.IsEditing = false;
-            var (resp,result) = await WebApi.SendData<Area>(CreatingArea);
-            CreatingArea.Id = result.Id;
+            CreatingArea.StopEditing();
             CreatingArea = null;
         });
 

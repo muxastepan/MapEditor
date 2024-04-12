@@ -11,6 +11,8 @@
         xmlns:utilities="clr-namespace:MapEditor.Utilities"
         xmlns:converters="clr-namespace:MapEditor.Converters"
         xmlns:models1="clr-namespace:NavigationApp.Models;assembly=WebApiNET"
+        xmlns:models2="clr-namespace:MapEditor.Models"
+        xmlns:mapElements="clr-namespace:MapEditor.Models.MapElements"
         mc:Ignorable="d"
         ResizeMode="NoResize"
         WindowState="Maximized"
@@ -39,7 +41,7 @@
             </Style.Triggers>
         </Style>
 
-        <DataTemplate DataType="{x:Type models:VisualNode}">
+        <DataTemplate DataType="{x:Type mapElements:VisualNode}">
             <CheckBox
                 Template="{StaticResource NodeButtonTemplate}"
                 Width="{Binding Width}"
@@ -48,6 +50,12 @@
                 IsChecked="{Binding IsSelected, Mode=TwoWay}"
                 Visibility="{Binding IsVisible,Converter={StaticResource BooleanToVisibilityConverter}}"
                 Content="{Binding LinkedFloor}">
+                <CheckBox.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Удалить"
+                                  Command="{Binding}"/>
+                    </ContextMenu>
+                </CheckBox.ContextMenu>
                 <b:Interaction.Triggers>
 
                     <b:KeyTrigger Key="Delete">
@@ -74,7 +82,7 @@
             </CheckBox>
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type models:Link}">
+        <DataTemplate DataType="{x:Type mapElements:Link}">
             <CheckBox
                 IsChecked="{Binding IsSelected,Mode=TwoWay}"
                 Visibility="{Binding IsVisible,Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -106,9 +114,9 @@
             </CheckBox>
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type models1:Area}">
+        <DataTemplate DataType="{x:Type mapElements:VisualArea}">
             <Grid>
-                <ItemsControl ItemsSource="{Binding NaviPoints}"
+                <ItemsControl ItemsSource="{Binding Area.NaviPoints}"
                       Panel.ZIndex="1">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -147,7 +155,7 @@
             IsChecked="{Binding IsSelected, 
             Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
             Template="{StaticResource AreaButtonTemplate}"
-            Content="{Binding NaviPoints,Converter={StaticResource PointConverter}}">
+            Content="{Binding Area.NaviPoints,Converter={StaticResource PointConverter}}">
                     <b:Interaction.Triggers>
                         <b:KeyTrigger Key="Delete">
                             <b:InvokeCommandAction
@@ -283,8 +291,7 @@
                     </ItemsControl.ItemsPanel>
                 </ItemsControl>
 
-                <ItemsControl ItemsSource="{Binding Areas}"
-                              >
+                <ItemsControl ItemsSource="{Binding Areas}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Canvas/>
