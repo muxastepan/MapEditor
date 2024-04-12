@@ -15,6 +15,8 @@ namespace MapEditor.Models.MapElements
             set => SetAndNotify(value);
         }
 
+        public bool IsFinished { get; set; }
+
         public double PointWidth
         {
             get => GetOrCreate<double>();
@@ -45,8 +47,17 @@ namespace MapEditor.Models.MapElements
         public async Task StopEditing()
         {
             IsEditing = false;
-            var (resp, result) = await WebApi.SendData<Area>(Area);
-            Area.Id = result.Id;
+            if (IsFinished)
+            {
+                await WebApi.UpdateData<Area>(Area,Area.Id.ToString());
+            }
+            else
+            {
+                IsFinished = true;   
+                var (resp, result) = await WebApi.SendData<Area>(Area);
+                Area.Id = result.Id;
+            }
+            
         }
     }
 }

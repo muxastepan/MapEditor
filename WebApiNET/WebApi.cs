@@ -31,6 +31,24 @@ namespace WebApiNET
         }
 
 
+        public static async Task<ObservableCollection<Dictionary<string, string>>> GetBusinessObjectsData(string route, List<string> fields)
+        {
+            var url = $"{Host}/{route}";
+            var resultCollection = new ObservableCollection<Dictionary<string, string>>();
+            var result = await HttpClient.GetStringAsync(url);
+            var json = JsonConvert.DeserializeObject<ObservableCollection<Dictionary<string, string>>>(result);
+            foreach (var obj in json)
+            {
+                foreach (var keyValue in obj.Where(keyValue => !fields.Contains(keyValue.Key)))
+                {
+                    obj.Remove(keyValue.Key);
+                }
+                resultCollection.Add(obj);
+            }
+
+            return resultCollection;
+        }
+
         public static async Task<T?> GetData<T>(string addedParams = null, string mediaType = "application/json") where T : new()
         {
             if (!Directory.Exists("CacheData"))

@@ -13,6 +13,7 @@
         xmlns:models1="clr-namespace:NavigationApp.Models;assembly=WebApiNET"
         xmlns:models2="clr-namespace:MapEditor.Models"
         xmlns:mapElements="clr-namespace:MapEditor.Models.MapElements"
+        xmlns:helpers="clr-namespace:MapEditor.Helpers"
         mc:Ignorable="d"
         ResizeMode="NoResize"
         WindowState="Maximized"
@@ -21,7 +22,7 @@
         <viewModels:MainWindowViewModel/>
     </Window.DataContext>
     <Window.Resources>
-
+        <helpers:MainWindowViewModelBindingProxy x:Key="ViewModelBindingProxy" Data="{Binding }"/>
         <Style TargetType="RadioButton" x:Key="ToolRadioButtonStyle">
             <Setter Property="Template" Value="{StaticResource ToolRadioButtonTemplate}"/>
             <Setter Property="Margin" Value="5"/>
@@ -43,6 +44,7 @@
 
         <DataTemplate DataType="{x:Type mapElements:VisualNode}">
             <CheckBox
+                Tag="{Binding}"
                 Template="{StaticResource NodeButtonTemplate}"
                 Width="{Binding Width}"
                 Height="{Binding Height}"
@@ -50,16 +52,23 @@
                 IsChecked="{Binding IsSelected, Mode=TwoWay}"
                 Visibility="{Binding IsVisible,Converter={StaticResource BooleanToVisibilityConverter}}"
                 Content="{Binding LinkedFloor}">
-                <!--<CheckBox.ContextMenu>
-                    <ContextMenu>
+                <CheckBox.Resources>
+                    <helpers:MapElementBindingProxy Data="{Binding }" x:Key="MapElementBindingProxy"/>
+                </CheckBox.Resources>
+                <CheckBox.ContextMenu>
+                    <ContextMenu
+                        Name="ContextMenu">
                         <MenuItem Header="Удалить"
-                                  Command="{Binding DataContext.DeleteMapElementCommand,
-                            RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                                  CommandParameter="{Binding}"/>
+                                  Command="{Binding Data.DeleteMapElementCommand,Source={StaticResource ViewModelBindingProxy}}"
+                                  CommandParameter="{Binding  Data,Source={StaticResource MapElementBindingProxy}}"/>
                     </ContextMenu>
-                </CheckBox.ContextMenu>-->
+                </CheckBox.ContextMenu>
                 <b:Interaction.Triggers>
-
+                    <utilities:DisableRoutingEventTrigger EventName="MouseRightButtonDown">
+                        <b:ChangePropertyAction TargetObject="{Binding ElementName=ContextMenu}"
+                                                PropertyName="IsOpen"
+                                                Value="True"/>
+                    </utilities:DisableRoutingEventTrigger>
                     <b:KeyTrigger Key="Delete">
                         <b:InvokeCommandAction
                     Command="{Binding DataContext.DeleteMapElementCommand,
@@ -88,14 +97,16 @@
             <CheckBox
                 IsChecked="{Binding IsSelected,Mode=TwoWay}"
                 Visibility="{Binding IsVisible,Converter={StaticResource BooleanToVisibilityConverter}}">
-                <!--<CheckBox.ContextMenu>
+                <CheckBox.Resources>
+                    <helpers:MapElementBindingProxy Data="{Binding }" x:Key="MapElementBindingProxy"/>
+                </CheckBox.Resources>
+                <CheckBox.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Удалить"
-                                  Command="{Binding DataContext.DeleteMapElementCommand,
-                                  RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                                  CommandParameter="{Binding}"/>
+                                  Command="{Binding Data.DeleteMapElementCommand,Source={StaticResource ViewModelBindingProxy}}"
+                                  CommandParameter="{Binding Data,Source={StaticResource MapElementBindingProxy}}"/>
                     </ContextMenu>
-                </CheckBox.ContextMenu>-->
+                </CheckBox.ContextMenu>
                 <CheckBox.Template>
                     <ControlTemplate TargetType="CheckBox">
                         <Line
@@ -166,18 +177,19 @@
             Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
             Template="{StaticResource AreaButtonTemplate}"
             Content="{Binding Area.NaviPoints,Converter={StaticResource PointConverter}}">
-                    <!--<CheckBox.ContextMenu>
+                    <CheckBox.Resources>
+                        <helpers:MapElementBindingProxy Data="{Binding }" x:Key="MapElementBindingProxy"/>
+                    </CheckBox.Resources>
+                    <CheckBox.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="Удалить"
-                                      Command="{Binding DataContext.DeleteMapElementCommand,
-                                      RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                                      CommandParameter="{Binding}"/>
+                                      Command="{Binding Data.DeleteMapElementCommand,Source={StaticResource ViewModelBindingProxy}}"
+                                      CommandParameter="{Binding Data,Source={StaticResource MapElementBindingProxy}}"/>
                             <MenuItem Header="Редактировать"
-                                      Command="{Binding DataContext.EditAreaCommand,
-                                RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                                      CommandParameter="{Binding}"/>
+                                      Command="{Binding Data.EditAreaCommand,Source={StaticResource ViewModelBindingProxy}}"
+                                      CommandParameter="{Binding Data,Source={StaticResource MapElementBindingProxy}}"/>
                         </ContextMenu>
-                    </CheckBox.ContextMenu>-->
+                    </CheckBox.ContextMenu>
                     <b:Interaction.Triggers>
                         <b:KeyTrigger Key="Delete">
                             <b:InvokeCommandAction
@@ -208,6 +220,22 @@
                     </CheckBox.Style>
                 </CheckBox>
             </Grid>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type models2:BusinessObject}">
+            <ListBox ItemsSource="{Binding Objects}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <ItemsControl ItemsSource="{Binding Values}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding }"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </DataTemplate>
     </Window.Resources>
 
@@ -266,6 +294,23 @@
                     </ComboBox.ItemTemplate>
                 </ComboBox>
             </StackPanel>
+        </Border>
+
+        <Border Background="LightGray"
+                Width="300"
+                Height="280"
+                CornerRadius="10"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Left"
+                Panel.ZIndex="10"
+                Margin="10">
+            <TabControl ItemsSource="{Binding Settings.NetworkSettings.BusinessObjects}">
+                <TabControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}"/>
+                    </DataTemplate>
+                </TabControl.ItemTemplate>
+            </TabControl>
         </Border>
         <controls:ZoomBorder
             Width="{Binding SelectedFloor.DisposableImage.Source.Width}"

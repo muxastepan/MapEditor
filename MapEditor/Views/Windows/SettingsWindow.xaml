@@ -8,7 +8,7 @@
         xmlns:settings="clr-namespace:MapEditor.Models.Settings"
         xmlns:models="clr-namespace:MapEditor.Models"
         mc:Ignorable="d"
-        Title="Настройки" Height="400" Width="400"
+        Title="Настройки" Height="700" Width="400"
         WindowStartupLocation="CenterScreen">
     <Window.DataContext>
         <viewModels:SettingsWindowViewModel/>
@@ -29,6 +29,8 @@
 
         <DataTemplate DataType="{x:Type models:BusinessObject}">
             <StackPanel>
+                <TextBlock Text="Наименование"/>
+                <TextBox Text="{Binding Name,Mode=TwoWay}"/>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Относительный URL"
                                Margin="10"/>
@@ -40,16 +42,13 @@
                         Command="{Binding DataContext.AddFieldCommand,RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}"
                         CommandParameter="{Binding}"/>
                 </StackPanel>
-                <ItemsControl ItemsSource="{Binding Fields.Keys}">
+                <ItemsControl ItemsSource="{Binding FieldNames}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-
                             <StackPanel>
                                 <TextBlock Text="Имя поля в API"/>
-                                <TextBox Text="{Binding Mode=TwoWay}"/>
+                                <TextBox Text="{Binding Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                             </StackPanel>
-
-
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
@@ -93,35 +92,26 @@
 
         <DataTemplate DataType="{x:Type settings:NetworkSettings}">
             <StackPanel>
-
                 <TextBlock Text="Ссылка на API"
                            Margin="10"/>
                 <TextBox Text="{Binding ApiUrl,Mode=TwoWay}"
                          Margin="10"/>
 
-                <TextBlock Text="Ссылка на навигационный сервис"
-                           Margin="10"/>
-                <TextBox Text="{Binding NaviUrl,Mode=TwoWay}"
-                         Margin="10"/>
-
-            </StackPanel>
-        </DataTemplate>
-
-        <DataTemplate DataType="{x:Type settings:BusinessObjectsSettings}">
-            <StackPanel>
                 <ListBox ItemsSource="{Binding BusinessObjects}"
-                         SelectedItem="{Binding DataContext.SelectedBusinessObject,RelativeSource={RelativeSource FindAncestor,AncestorType=Window},Mode=TwoWay}"/>
+                         MaxHeight="400"
+                             SelectedItem="{Binding DataContext.SelectedBusinessObject,RelativeSource={RelativeSource FindAncestor,AncestorType=Window},Mode=TwoWay}"/>
                 <Button Content="Добавить объект"
-                        Margin="0 20 0 0"
-                        FontSize="20"
-                        Command="{Binding DataContext.AddBusinessObjectCommand,RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}"/>
+                            Margin="0 20 0 0"
+                            FontSize="20"
+                            Command="{Binding DataContext.AddBusinessObjectCommand,RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}"/>
 
                 <Button Content="Удалить объект"
-                        Margin="0 10 0 0"
-                        FontSize="20"
-                        Command="{Binding DataContext.DeleteBusinessObjectCommand,RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}"/>
+                            Margin="0 10 0 0"
+                            FontSize="20"
+                            Command="{Binding DataContext.DeleteBusinessObjectCommand,RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}"/>
             </StackPanel>
         </DataTemplate>
+
     </Window.Resources>
     <StackPanel>
         <TabControl>
@@ -131,9 +121,6 @@
                 Header="Сеть"/>
                 <TabItem Header="Вид"
                      Content="{Binding Settings.VisualSettings}"/>
-                <TabItem Header="Объекты"
-                     Content="{Binding Settings.BusinessObjectsSettings}">
-                </TabItem>
             </TabControl.Items>
         </TabControl>
         <Button Content="Сохранить и выйти"

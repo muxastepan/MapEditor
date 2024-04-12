@@ -13,7 +13,7 @@ namespace MapEditor.Helpers
                 NetworkSettings = new NetworkSettings
                 {
                     ApiUrl = "http://127.0.0.1:8000",
-                    NaviUrl = "https://navi.vibromatvey.ru/",
+                    BusinessObjects = new ObservableCollection<BusinessObject>(),
                 },
                 VisualSettings = new VisualSettings
                 {
@@ -23,7 +23,6 @@ namespace MapEditor.Helpers
                     AreaPointWidth = 50,
                     AreaPointHeight = 50,
                 },
-                BusinessObjectsSettings = new BusinessObjectsSettings()
             };
         }
     }

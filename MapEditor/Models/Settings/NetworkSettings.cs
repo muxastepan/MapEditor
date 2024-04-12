@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,10 +16,10 @@ namespace MapEditor.Models.Settings
             set => SetAndNotify(value);
         }
 
-        public string NaviUrl
+        public ObservableCollection<BusinessObject> BusinessObjects
         {
-            get => GetOrCreate<string>();
-            set=> SetAndNotify(value);
+            get => GetOrCreate(new ObservableCollection<BusinessObject>());
+            set => SetAndNotify(value);
         }
 
     }

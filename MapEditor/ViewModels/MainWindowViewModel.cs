@@ -36,7 +36,7 @@ namespace MapEditor.ViewModels
             Areas.CollectionChanged += Areas_CollectionChanged;
             Links.CollectionChanged += Links_CollectionChanged;
             Settings = _settingsManager.Read();
-            WebApi.Host = Settings.NetworkSettings.NaviUrl;
+            WebApi.Host = Settings.NetworkSettings.ApiUrl;
             LoadResources();
         }
 
@@ -159,9 +159,18 @@ namespace MapEditor.ViewModels
             await GetFloors();
             await GetAreas();
             await GetNodes();
+            await GetBusinessObjects();
             if (Floors?.Count > 0) SelectedFloor = Floors[0];
         }
 
+        private async Task GetBusinessObjects()
+        {
+            foreach (var businessObject in Settings.NetworkSettings.BusinessObjects)
+            {
+                var fields = businessObject.FieldNames.Select(fieldName => fieldName.Value).ToList();
+                businessObject.Objects = await WebApi.GetBusinessObjectsData(businessObject.Url, fields);
+            }
+        }
         private async Task GetFloors()
         {
             Floors = await WebApi.GetData<ObservableCollection<Floor>>();
@@ -300,6 +309,7 @@ namespace MapEditor.ViewModels
             {
                 case VisualNode vn:
                     Nodes.Remove(vn);
+                    await DeleteEmptyLinks(vn);
                     break;
                 case VisualArea va:
                     Areas.Remove(va);
@@ -542,7 +552,12 @@ namespace MapEditor.ViewModels
                 visualArea.PointWidth = Settings.VisualSettings.AreaPointWidth;
             }
 
-            WebApi.Host = Settings.NetworkSettings.NaviUrl;
+            if (WebApi.Host != Settings.NetworkSettings.ApiUrl)
+            {
+                WebApi.Host = Settings.NetworkSettings.ApiUrl;
+                LoadResources();
+            }
+            WebApi.Host = Settings.NetworkSettings.ApiUrl;
         }
 
         #endregion

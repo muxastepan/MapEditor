@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace MapEditor.Models
 {
-    public class BaseField
+    public class Field
     {
-        public string Key { get; set; }
         public string Value { get; set; }
     }
 }

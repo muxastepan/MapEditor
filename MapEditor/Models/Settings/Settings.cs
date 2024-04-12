@@ -16,12 +16,6 @@ namespace MapEditor.Models.Settings
             get=> GetOrCreate<VisualSettings>();
             set=>SetAndNotify(value);
         }
-
-        public BusinessObjectsSettings BusinessObjectsSettings
-        {
-            get => GetOrCreate<BusinessObjectsSettings>();
-            set => SetAndNotify(value);
-        }
        
     }
 }
