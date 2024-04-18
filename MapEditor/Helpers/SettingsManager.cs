@@ -13,7 +13,7 @@ namespace MapEditor.Helpers
                 NetworkSettings = new NetworkSettings
                 {
                     ApiUrl = "http://127.0.0.1:8000",
-                    BusinessObjects = new ObservableCollection<BusinessObject>(),
+                    BusinessEntities = new ObservableCollection<BusinessEntity>(),
                 },
                 VisualSettings = new VisualSettings
                 {

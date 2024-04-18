@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using NavigationApp.Models;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using Nito.AsyncEx;
 
@@ -18,6 +19,7 @@ namespace WebApiNET
         public static string Host { get; set; } = File.Exists("host.txt") ? File.ReadAllText("host.txt") : "http://127.0.0.1:8000";
 
         private static readonly HttpClient HttpClient;
+        public static bool UseApiSuffix;
 
         static WebApi()
         {
@@ -31,23 +33,21 @@ namespace WebApiNET
         }
 
 
-        public static async Task<ObservableCollection<Dictionary<string, string>>> GetBusinessObjectsData(string route, List<string> fields)
+        public static async Task<JArray?> GetDynamicDataArray(string route)
         {
-            var url = $"{Host}/{route}";
-            var resultCollection = new ObservableCollection<Dictionary<string, string>>();
-            var result = await HttpClient.GetStringAsync(url);
-            var json = JsonConvert.DeserializeObject<ObservableCollection<Dictionary<string, string>>>(result);
-            foreach (var obj in json)
+            try
             {
-                foreach (var keyValue in obj.Where(keyValue => !fields.Contains(keyValue.Key)))
-                {
-                    obj.Remove(keyValue.Key);
-                }
-                resultCollection.Add(obj);
+                var url = $"{Host}/{(UseApiSuffix ? "api" : string.Empty)}/{route}";
+                var result = await HttpClient.GetStringAsync(url);
+                var json = JArray.Parse(result);
+                return json;
             }
-
-            return resultCollection;
+            catch (Exception e)
+            {
+                return null;
+            }
         }
+
 
         public static async Task<T?> GetData<T>(string addedParams = null, string mediaType = "application/json") where T : new()
         {
@@ -62,7 +62,7 @@ namespace WebApiNET
             try
             {
                 var route = GetRouteStr(new T());
-                Debug.WriteLine($"{Host}/{route}/{(string.IsNullOrEmpty(addedParams) ? string.Empty : addedParams)}");
+                Debug.WriteLine($"{Host}/{(UseApiSuffix?"api":string.Empty)}/{route}/{(string.IsNullOrEmpty(addedParams) ? string.Empty : addedParams)}");
                 var routePath = RemovePunctuations(route);
                 var addedParamsPath = "";
                 if (!string.IsNullOrEmpty(addedParams))
@@ -71,7 +71,7 @@ namespace WebApiNET
                     Directory.CreateDirectory("CacheData/" + routePath);
                 path = "CacheData/" + routePath + "/" + "data" + (string.IsNullOrEmpty(addedParams) ? string.Empty : "_" + addedParamsPath) + ".txt";
 
-                result = await HttpClient.GetStringAsync($"{Host}/{route}{addedParams}");
+                result = await HttpClient.GetStringAsync($"{Host}/{(UseApiSuffix?"api":string.Empty)}/{route}{addedParams}");
                 File.WriteAllText(path, result);
                 return JsonConvert.DeserializeObject<T>(result);
             }
@@ -100,7 +100,7 @@ namespace WebApiNET
         public static async Task<bool> LoadFile<T>(string filePath, string requestField = "file", List<Tuple<string, string>>? stringContents = null, string addedParams = "") where T : new()
         {
             var route = GetRouteStr(new T());
-            var url = $"{Host}/{route}/{addedParams}";
+            var url = $"{Host}/{(UseApiSuffix?"api":string.Empty)}/{route}/{addedParams}";
 
             using var multipartFormContent = new MultipartFormDataContent();
             var fileStreamContent = new StreamContent(File.OpenRead(filePath));
@@ -133,9 +133,12 @@ namespace WebApiNET
             try
             {
                 var route = GetRouteStr(sendObject);
-                var url = $"{Host}/{route}/";
+                var url = $"{Host}/{(UseApiSuffix?"api":string.Empty)}/{route}";
                 var jsonSettings = new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() };
-                var content = JsonConvert.SerializeObject(sendObject, jsonSettings);
+                var objectWithoutId = JObject.FromObject(sendObject);
+                objectWithoutId.Remove("id");
+                var content = JsonConvert.SerializeObject(objectWithoutId, jsonSettings);
+
                 var data = new StringContent(content, Encoding.UTF8, "application/json");
                 using var client = new HttpClient();
                 var response = await client.PostAsync(url, data);
@@ -166,10 +169,35 @@ namespace WebApiNET
             try
             {
                 var route = GetRouteStr(new T());
-                var url = $"{Host}/{route}/{addedParams}";
+                var url = $"{Host}/{(UseApiSuffix ? "api" : string.Empty)}/{route}/{addedParams}";
                 using var client = new HttpClient();
                 var response = await client.PatchAsync(url, content);
                 var result = await response.Content.ReadAsStringAsync();
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+
+        public static async Task<bool> UpdateData<T>(object updateObject, string id, string route) where T : new()
+        {
+            try
+            {
+                var url = $"{Host}/{(UseApiSuffix ? "api" : string.Empty)}/{route}/{id}";
+
+                var objectWithoutId = JObject.FromObject(updateObject);
+                objectWithoutId.Remove("id");
+
+                var request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Patch,
+                    Content = new StringContent(JsonConvert.SerializeObject(objectWithoutId), null, "application/merge-patch+json"),
+                    RequestUri = new Uri(url)
+                };
+                using var client = new HttpClient();
+                var response = await client.SendAsync(request);
                 return response.IsSuccessStatusCode;
             }
             catch (Exception e)
@@ -183,11 +211,15 @@ namespace WebApiNET
             try
             {
                 var route = GetRouteStr(new T());
-                var url = $"{Host}/{route}/{id}/";
+                var url = $"{Host}/{(UseApiSuffix ? "api" : string.Empty)}/{route}/{id}";
+
+                var objectWithoutId = JObject.FromObject(updateObject);
+                objectWithoutId.Remove("id");
+
                 var request = new HttpRequestMessage
                 {
-                    Method = HttpMethod.Put,
-                    Content = new StringContent(JsonConvert.SerializeObject(updateObject),null, "application/json"),
+                    Method = HttpMethod.Patch,
+                    Content = new StringContent(JsonConvert.SerializeObject(objectWithoutId),null, "application/merge-patch+json"),
                     RequestUri = new Uri(url)
                 };
                 using var client = new HttpClient();
@@ -205,7 +237,7 @@ namespace WebApiNET
             try
             {
                 var route = GetRouteStr(new T());
-                var url = $"{Host}/{route}/{id}/";
+                var url = $"{Host}/{(UseApiSuffix ? "api" : string.Empty)}/{route}/{id}";
                 var request = new HttpRequestMessage
                 {
                     Method = HttpMethod.Delete,

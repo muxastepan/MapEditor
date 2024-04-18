@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Core;
+using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Core;
-using Newtonsoft.Json;
 
 namespace NavigationApp.Models
 {

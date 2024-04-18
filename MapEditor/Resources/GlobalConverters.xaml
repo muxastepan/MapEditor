@@ -4,4 +4,5 @@
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     <converters:EqualsConverter x:Key="EqualsConverter"/>
     <converters:PointConverter x:Key="PointConverter"/>
+    <converters:MultiBindingConverter x:Key="MultiBindingConverter"/>
 </ResourceDictionary>

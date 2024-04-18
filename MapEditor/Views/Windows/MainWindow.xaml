@@ -61,6 +61,9 @@
                         <MenuItem Header="Удалить"
                                   Command="{Binding Data.DeleteMapElementCommand,Source={StaticResource ViewModelBindingProxy}}"
                                   CommandParameter="{Binding  Data,Source={StaticResource MapElementBindingProxy}}"/>
+                        <MenuItem Header="Привязать к объекту..."
+                                  Command="{Binding Data.LinkMapElementToBusinessElementCommand,Source={StaticResource ViewModelBindingProxy}}"
+                                  CommandParameter="{Binding Data,Source={StaticResource MapElementBindingProxy}}"/>
                     </ContextMenu>
                 </CheckBox.ContextMenu>
                 <b:Interaction.Triggers>
@@ -188,6 +191,9 @@
                             <MenuItem Header="Редактировать"
                                       Command="{Binding Data.EditAreaCommand,Source={StaticResource ViewModelBindingProxy}}"
                                       CommandParameter="{Binding Data,Source={StaticResource MapElementBindingProxy}}"/>
+                            <MenuItem Header="Привязать к объекту..."
+                                      Command="{Binding Data.LinkMapElementToBusinessElementCommand,Source={StaticResource ViewModelBindingProxy}}"
+                                      CommandParameter="{Binding Data,Source={StaticResource MapElementBindingProxy}}"/>
                         </ContextMenu>
                     </CheckBox.ContextMenu>
                     <b:Interaction.Triggers>
@@ -222,21 +228,60 @@
             </Grid>
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type models2:BusinessObject}">
-            <ListBox ItemsSource="{Binding Objects}">
+        <DataTemplate DataType="{x:Type models2:BusinessEntity}">
+
+            <ListBox ItemsSource="{Binding BusinessElements}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <ItemsControl ItemsSource="{Binding Values}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding }"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                        <StackPanel>
+                            <ItemsControl ItemsSource="{Binding Fields}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock>
+                                        <Run Text="{Binding VerboseName}"/>
+                                        <Run Text=":"/>
+                                        <Run Text="{Binding Value}"/>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <StackPanel Orientation="Horizontal">
+
+                                <TextBlock Text="Связанные точки:"/>
+                                <ItemsControl ItemsSource="{Binding NodeField}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding }"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Связанные области:"/>
+                                <ItemsControl ItemsSource="{Binding AreasField}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding }"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
         </DataTemplate>
+
     </Window.Resources>
 
     <b:Interaction.Triggers>
@@ -304,7 +349,7 @@
                 HorizontalAlignment="Left"
                 Panel.ZIndex="10"
                 Margin="10">
-            <TabControl ItemsSource="{Binding Settings.NetworkSettings.BusinessObjects}">
+            <TabControl ItemsSource="{Binding Settings.NetworkSettings.BusinessEntities}">
                 <TabControl.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Name}"/>
@@ -326,11 +371,11 @@
                 </b:Interaction.Triggers>
                 <Image Source="{Binding SelectedFloor.DisposableImage.Source}"
                        Stretch="None"/>
-                
+
                 <ItemsControl ItemsSource="{Binding Nodes}"
                               Panel.ZIndex="2"
                               x:Name="NodesItemsControl">
-                    
+
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Canvas/>
@@ -367,6 +412,7 @@
 
                 <Polyline Stroke="Orange"
                           StrokeThickness="10"
+                          Panel.ZIndex="1"
                           Points="{Binding FloorRoute,Converter={StaticResource PointConverter}}"/>
             </Grid>
         </controls:ZoomBorder>

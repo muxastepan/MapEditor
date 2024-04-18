@@ -37,6 +37,7 @@ namespace MapEditor.ViewModels
             Links.CollectionChanged += Links_CollectionChanged;
             Settings = _settingsManager.Read();
             WebApi.Host = Settings.NetworkSettings.ApiUrl;
+            WebApi.UseApiSuffix = Settings.NetworkSettings.UseApiSuffix;
             LoadResources();
         }
 
@@ -69,7 +70,7 @@ namespace MapEditor.ViewModels
             set => SetAndNotify(value,callback:SelectedToolChanged);
         }
 
-        public Floor SelectedFloor
+        public Floor? SelectedFloor
         {
             get => GetOrCreate<Floor>();
             set => SetAndNotify(value, callback: SelectedFloorChanged);
@@ -147,7 +148,7 @@ namespace MapEditor.ViewModels
         }
 
 
-        private void SelectedFloorChanged(PropertyChangingArgs<Floor> args)
+        private void SelectedFloorChanged(PropertyChangingArgs<Floor?> args)
         {
             FilterMapElementsByFloor();
         }
@@ -159,16 +160,42 @@ namespace MapEditor.ViewModels
             await GetFloors();
             await GetAreas();
             await GetNodes();
-            await GetBusinessObjects();
+            await GetBusinessElements();
             if (Floors?.Count > 0) SelectedFloor = Floors[0];
         }
 
-        private async Task GetBusinessObjects()
+        private async Task GetBusinessElements()
         {
-            foreach (var businessObject in Settings.NetworkSettings.BusinessObjects)
+            foreach (var businessEntity in Settings.NetworkSettings.BusinessEntities)
             {
-                var fields = businessObject.FieldNames.Select(fieldName => fieldName.Value).ToList();
-                businessObject.Objects = await WebApi.GetBusinessObjectsData(businessObject.Url, fields);
+                businessEntity.BusinessElements.Clear();
+                var fields = businessEntity.FieldNames.Select(fieldName => fieldName.Key).ToList();
+                var rawBusinessElements = await WebApi.GetDynamicDataArray(businessEntity.Url);
+                foreach (var element in rawBusinessElements)
+                {
+                    var newBusinessElement = new BusinessElement();
+                    
+                    foreach (var field in fields)
+                    {
+                        var declaredKey = businessEntity.FieldNames.First(item => item.Key == field);
+                        if (element[field] is null) continue;
+                        newBusinessElement.Fields.Add(new Field
+                        {
+                            IsPrimary = declaredKey.IsPrimary,
+                            IsVisible = declaredKey.IsVisible,
+                            Key = field,
+                            Value = element[field].ToString(),
+                            VerboseName = declaredKey.VerboseName,
+                        });
+                    }
+                    if (element["nodes"] is null || element["areas"] is null) continue;
+
+                    //newBusinessElement.NodeField = element["nodes"].ToObject<int>();
+                    newBusinessElement.NodeField = element["nodes"].ToObject<ObservableCollection<int>>();
+                    newBusinessElement.AreasField = element["areas"].ToObject<ObservableCollection<int>>();
+
+                    businessEntity.BusinessElements.Add(newBusinessElement);
+                }
             }
         }
         private async Task GetFloors()
@@ -176,7 +203,7 @@ namespace MapEditor.ViewModels
             Floors = await WebApi.GetData<ObservableCollection<Floor>>();
             foreach (var floor in Floors)
             {
-                floor.DisposableImage = new DisposableImage(await WebApi.DownloadIFile(floor.Image, uriKind: UriKind.Absolute));
+                floor.DisposableImage = new DisposableImage(await WebApi.DownloadIFile(floor.Image, uriKind: UriKind.Relative));
             }
         }
 
@@ -224,6 +251,7 @@ namespace MapEditor.ViewModels
 
         private void FilterMapElementsByFloor()
         {
+            if(SelectedFloor is null) return;
             foreach (var visualNode in Nodes)
             {
                 visualNode.IsVisible = visualNode.Node.Point.Floor == SelectedFloor.Id;
@@ -324,6 +352,24 @@ namespace MapEditor.ViewModels
         #endregion
 
         #region Commands
+
+        private ICommand? _linkMapElementToBusinessElementCommand;
+
+        public ICommand LinkMapElementToBusinessElementCommand =>
+            _linkMapElementToBusinessElementCommand ??= new RelayCommand(async f =>
+            {
+                if(f is not MapElement me) return;
+                var selectionWindow = new BusinessElementSelectionWindow
+                {
+                    DataContext = new BusinessElementSelectionWindowViewModel
+                    {
+                        BusinessEntities = Settings.NetworkSettings.BusinessEntities,
+                        SelectedMapElement = me
+                    }
+                };
+                selectionWindow.Show();
+            });
+
         private ICommand? _selectToolCommand;
 
         public ICommand SelectToolCommand => _selectToolCommand ??= new RelayCommand(async f =>
@@ -536,7 +582,7 @@ namespace MapEditor.ViewModels
             settingsWindow.Show();
         });
 
-        private void SettingsWindow_Closed(object? sender, EventArgs e)
+        private async void SettingsWindow_Closed(object? sender, EventArgs e)
         {
             _settingsManager.Write(Settings);
             foreach (var visualNode in Nodes)
@@ -552,12 +598,15 @@ namespace MapEditor.ViewModels
                 visualArea.PointWidth = Settings.VisualSettings.AreaPointWidth;
             }
 
-            if (WebApi.Host != Settings.NetworkSettings.ApiUrl)
+            if (WebApi.Host != Settings.NetworkSettings.ApiUrl || WebApi.UseApiSuffix!= Settings.NetworkSettings.UseApiSuffix)
             {
                 WebApi.Host = Settings.NetworkSettings.ApiUrl;
+                WebApi.UseApiSuffix = Settings.NetworkSettings.UseApiSuffix;
                 LoadResources();
             }
-            WebApi.Host = Settings.NetworkSettings.ApiUrl;
+
+            await GetBusinessElements();
+
         }
 
         #endregion

@@ -20,9 +20,9 @@ namespace MapEditor.ViewModels
             set=>SetAndNotify(value);
         }
 
-        public BusinessObject SelectedBusinessObject
+        public BusinessEntity SelectedBusinessEntity
         {
-            get=>GetOrCreate<BusinessObject>();
+            get=>GetOrCreate<BusinessEntity>();
             set=>SetAndNotify(value);
         }
 
@@ -37,20 +37,20 @@ namespace MapEditor.ViewModels
 
         public ICommand AddFieldCommand => _addFieldCommand ??= new RelayCommand(f =>
         {
-            if(f is not BusinessObject bo) return;
-            bo.FieldNames.Add(new Field{Value = "example"});
+            if(f is not BusinessEntity bo) return;
+            bo.FieldNames.Add(new Field{Key = "example",IsVisible = true});
         });
 
         private ICommand? _addBusinessObjectCommand;
         public ICommand AddBusinessObjectCommand => _addBusinessObjectCommand ??= new RelayCommand(f =>
         {
-            Settings.NetworkSettings.BusinessObjects.Add(new BusinessObject());
+            Settings.NetworkSettings.BusinessEntities.Add(new BusinessEntity());
         });
 
         private ICommand? _deleteBusinessObjectCommand;
         public ICommand DeleteBusinessObjectCommand => _deleteBusinessObjectCommand ??= new RelayCommand(f =>
         {
-            Settings.NetworkSettings.BusinessObjects.Remove(SelectedBusinessObject);
+            Settings.NetworkSettings.BusinessEntities.Remove(SelectedBusinessEntity);
         });
     }
 }

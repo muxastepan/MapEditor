@@ -16,9 +16,16 @@ namespace MapEditor.Models.Settings
             set => SetAndNotify(value);
         }
 
-        public ObservableCollection<BusinessObject> BusinessObjects
+        public bool UseApiSuffix
         {
-            get => GetOrCreate(new ObservableCollection<BusinessObject>());
+            get => GetOrCreate(true);
+            set => SetAndNotify(value);
+        }
+
+
+        public ObservableCollection<BusinessEntity> BusinessEntities
+        {
+            get => GetOrCreate(new ObservableCollection<BusinessEntity>());
             set => SetAndNotify(value);
         }
 

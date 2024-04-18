@@ -12,7 +12,7 @@ namespace NavigationApp.Models
         [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonProperty("map_image")]
+        [JsonProperty("mapImage")]
         public string Image { get; set; }
 
         [JsonIgnore]

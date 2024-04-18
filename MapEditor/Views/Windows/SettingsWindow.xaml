@@ -23,11 +23,8 @@
             <Setter Property="FontSize" Value="16"/>
         </Style>
 
-        <!--<DataTemplate DataType="{x:Type models:BaseField}">
-            
-        </DataTemplate>-->
 
-        <DataTemplate DataType="{x:Type models:BusinessObject}">
+        <DataTemplate DataType="{x:Type models:BusinessEntity}">
             <StackPanel>
                 <TextBlock Text="Наименование"/>
                 <TextBox Text="{Binding Name,Mode=TwoWay}"/>
@@ -37,6 +34,7 @@
                     <TextBox Text="{Binding Url,Mode=TwoWay}"
                              MinWidth="80"
                              Margin="10"/>
+
                     <Button Content="Добавить поле"
                             HorizontalAlignment="Right"
                         Command="{Binding DataContext.AddFieldCommand,RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}"
@@ -46,8 +44,15 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <StackPanel>
-                                <TextBlock Text="Имя поля в API"/>
-                                <TextBox Text="{Binding Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Text="Ключ поля в API"/>
+                                <TextBox Text="{Binding Key,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Text="Имя поля"/>
+                                <TextBox Text="{Binding VerboseName,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                <CheckBox Content="Отображать поле"
+                                          IsChecked="{Binding IsVisible,Mode=TwoWay}"/>
+                                <RadioButton 
+                                    Content="Первичный ключ"
+                                    GroupName="PrimaryKey" IsChecked="{Binding IsPrimary,Mode=TwoWay}"/>
                             </StackPanel>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -97,9 +102,15 @@
                 <TextBox Text="{Binding ApiUrl,Mode=TwoWay}"
                          Margin="10"/>
 
-                <ListBox ItemsSource="{Binding BusinessObjects}"
+                <CheckBox 
+                    Margin="10"
+                    Content="Использовать суффикс api в ссылке" 
+                    IsChecked="{Binding  UseApiSuffix,Mode=TwoWay}"/>
+
+
+                <ListBox ItemsSource="{Binding BusinessEntities}"
                          MaxHeight="400"
-                             SelectedItem="{Binding DataContext.SelectedBusinessObject,RelativeSource={RelativeSource FindAncestor,AncestorType=Window},Mode=TwoWay}"/>
+                             SelectedItem="{Binding DataContext.SelectedBusinessEntity,RelativeSource={RelativeSource FindAncestor,AncestorType=Window},Mode=TwoWay}"/>
                 <Button Content="Добавить объект"
                             Margin="0 20 0 0"
                             FontSize="20"

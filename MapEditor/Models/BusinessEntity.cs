@@ -9,7 +9,7 @@ using Core;
 
 namespace MapEditor.Models
 {
-    public class BusinessObject:ObservableObject
+    public class BusinessEntity:ObservableObject
     {
         public string Name
         {
@@ -29,9 +29,9 @@ namespace MapEditor.Models
             set => SetAndNotify(value);
         }
 
-        public ObservableCollection<Dictionary<string, string>> Objects
+        public ObservableCollection<BusinessElement> BusinessElements
         {
-            get => GetOrCreate(new ObservableCollection<Dictionary<string, string>>());
+            get=>GetOrCreate(new ObservableCollection<BusinessElement>());
             set => SetAndNotify(value);
         }
     }
