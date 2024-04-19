@@ -25,7 +25,7 @@
             <Ellipse
             Name ="Ellipse"
             Stroke="Black"
-            Fill="White"
+            Fill="{TemplateBinding Background}"
             StrokeThickness="1"/>
             <TextBlock Text="{TemplateBinding Content}"
                        HorizontalAlignment="Center"
@@ -43,7 +43,7 @@
         <Polygon
             Name ="Polygon"
             Stroke="Black"
-            Fill="Gray"
+            Fill="{TemplateBinding Background}"
             Opacity="0.5"
             StrokeThickness="1"
             Points="{TemplateBinding Content}"/>

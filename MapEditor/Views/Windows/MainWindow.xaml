@@ -14,6 +14,7 @@
         xmlns:models2="clr-namespace:MapEditor.Models"
         xmlns:mapElements="clr-namespace:MapEditor.Models.MapElements"
         xmlns:helpers="clr-namespace:MapEditor.Helpers"
+        xmlns:bindingMapElements="clr-namespace:MapEditor.Models.MapElements.BindingMapElements"
         mc:Ignorable="d"
         ResizeMode="NoResize"
         WindowState="Maximized"
@@ -42,8 +43,12 @@
             </Style.Triggers>
         </Style>
 
-        <DataTemplate DataType="{x:Type mapElements:VisualNode}">
+        <DataTemplate DataType="{x:Type bindingMapElements:VisualNode}">
             <CheckBox
+                Name="CheckBox"
+                ToolTipService.InitialShowDelay="200"
+                ToolTipService.ShowOnDisabled="True"
+                ToolTipService.BetweenShowDelay="200"
                 Tag="{Binding}"
                 Template="{StaticResource NodeButtonTemplate}"
                 Width="{Binding Width}"
@@ -66,6 +71,18 @@
                                   CommandParameter="{Binding Data,Source={StaticResource MapElementBindingProxy}}"/>
                     </ContextMenu>
                 </CheckBox.ContextMenu>
+                <CheckBox.ToolTip>
+                    <ToolTip>
+                        <StackPanel>
+                            <TextBlock>
+                                <Run Text="ID точки"/>
+                                <Run Text=":"/>
+                                <Run Text="{Binding Node.Id}"/>
+                            </TextBlock>
+                            <ContentPresenter Content="{Binding BindedBusinessElement}"/>
+                        </StackPanel>
+                    </ToolTip>
+                </CheckBox.ToolTip>
                 <b:Interaction.Triggers>
                     <utilities:DisableRoutingEventTrigger EventName="MouseRightButtonDown">
                         <b:ChangePropertyAction TargetObject="{Binding ElementName=ContextMenu}"
@@ -94,6 +111,14 @@
                     </b:EventTrigger>
                 </b:Interaction.Triggers>
             </CheckBox>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsLinked}" Value="True">
+                    <Setter TargetName="CheckBox" Property="Background" Value="LightGreen"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsLinked}" Value="False">
+                    <Setter TargetName="CheckBox" Property="Background" Value="White"/>
+                </DataTrigger>
+            </DataTemplate.Triggers>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type mapElements:Link}">
@@ -138,7 +163,7 @@
             </CheckBox>
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type mapElements:VisualArea}">
+        <DataTemplate DataType="{x:Type bindingMapElements:VisualArea}">
             <Grid>
                 <ItemsControl ItemsSource="{Binding Area.NaviPoints}"
                       Panel.ZIndex="1">
@@ -175,11 +200,15 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
                 <CheckBox
-            Visibility="{Binding IsVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
-            IsChecked="{Binding IsSelected, 
-            Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
-            Template="{StaticResource AreaButtonTemplate}"
-            Content="{Binding Area.NaviPoints,Converter={StaticResource PointConverter}}">
+                    Name="CheckBox"
+                    ToolTipService.InitialShowDelay="200"
+                    ToolTipService.ShowOnDisabled="True"
+                    ToolTipService.BetweenShowDelay="200"
+                    Visibility="{Binding IsVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                    IsChecked="{Binding IsSelected, 
+                    Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                    Template="{StaticResource AreaButtonTemplate}"
+                    Content="{Binding Area.NaviPoints,Converter={StaticResource PointConverter}}">
                     <CheckBox.Resources>
                         <helpers:MapElementBindingProxy Data="{Binding }" x:Key="MapElementBindingProxy"/>
                     </CheckBox.Resources>
@@ -196,6 +225,18 @@
                                       CommandParameter="{Binding Data,Source={StaticResource MapElementBindingProxy}}"/>
                         </ContextMenu>
                     </CheckBox.ContextMenu>
+                    <CheckBox.ToolTip>
+                        <ToolTip>
+                            <StackPanel>
+                                <TextBlock>
+                                    <Run Text="ID области"/>
+                                    <Run Text=":"/>
+                                    <Run Text="{Binding Area.Id}"/>
+                                </TextBlock>
+                                <ContentPresenter Content="{Binding BindedBusinessElement}"/>
+                            </StackPanel>
+                        </ToolTip>
+                    </CheckBox.ToolTip>
                     <b:Interaction.Triggers>
                         <b:KeyTrigger Key="Delete">
                             <b:InvokeCommandAction
@@ -226,62 +267,19 @@
                     </CheckBox.Style>
                 </CheckBox>
             </Grid>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsLinked}" Value="True">
+                    <Setter TargetName="CheckBox" Property="Background" Value="LightGreen"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsLinked}" Value="False">
+                    <Setter TargetName="CheckBox" Property="Background" Value="Gray"/>
+                </DataTrigger>
+            </DataTemplate.Triggers>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type models2:BusinessEntity}">
-
-            <ListBox ItemsSource="{Binding BusinessElements}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel>
-                            <ItemsControl ItemsSource="{Binding Fields}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock>
-                                        <Run Text="{Binding VerboseName}"/>
-                                        <Run Text=":"/>
-                                        <Run Text="{Binding Value}"/>
-                                        </TextBlock>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                            <StackPanel Orientation="Horizontal">
-
-                                <TextBlock Text="Связанные точки:"/>
-                                <ItemsControl ItemsSource="{Binding NodeField}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <StackPanel Orientation="Horizontal"/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding }"/>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Связанные области:"/>
-                                <ItemsControl ItemsSource="{Binding AreasField}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <StackPanel Orientation="Horizontal"/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding }"/>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </StackPanel>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+            <ListBox ItemsSource="{Binding BusinessElements}"/>
         </DataTemplate>
-
     </Window.Resources>
 
     <b:Interaction.Triggers>

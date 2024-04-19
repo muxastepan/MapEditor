@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using MapEditor.Models.MapElements.BindingMapElements;
 using NavigationApp.Models;
 using WebApiNET;
 

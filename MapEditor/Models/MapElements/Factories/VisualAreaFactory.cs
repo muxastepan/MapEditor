@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using MapEditor.Models.MapElements.BindingMapElements;
 using MapEditor.Models.Settings;
 using NavigationApp.Models;
 

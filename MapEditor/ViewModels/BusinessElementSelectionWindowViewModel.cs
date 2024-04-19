@@ -8,6 +8,7 @@ using System.Windows.Input;
 using Core;
 using MapEditor.Models;
 using MapEditor.Models.MapElements;
+using MapEditor.Models.MapElements.BindingMapElements;
 using MapEditor.Views.Windows;
 using NavigationApp.Models;
 using WebApiNET;
@@ -34,9 +35,9 @@ namespace MapEditor.ViewModels
             set => SetAndNotify(value);
         }
 
-        public MapElement SelectedMapElement
+        public BindingMapElement SelectedMapElement
         {
-            get => GetOrCreate<MapElement>();
+            get => GetOrCreate<BindingMapElement>();
             set => SetAndNotify(value);
         }
 
@@ -49,10 +50,10 @@ namespace MapEditor.ViewModels
             switch (mapElement)
             {
                 case VisualNode vn:
-                    businessElement.NodeField.Add(vn.Node.Id);
+                    businessElement.NodeField=vn.Node.Id;
                     break;
                 case VisualArea va:
-                    businessElement.AreasField.Add(va.Area.Id);
+                    businessElement.AreaField = va.Area.Id;
                     break;
             }
             await WebApi.UpdateData<BusinessElement>(businessElement, id.Value, entity.Url);
@@ -68,10 +69,10 @@ namespace MapEditor.ViewModels
             switch (clearType)
             {
                 case ClearType.Node:
-                    businessElement.NodeField.Clear();
+                    businessElement.NodeField=0;
                     break;
                 case ClearType.Area:
-                    businessElement.AreasField.Clear();
+                    businessElement.AreaField = 0;
                     break;
                 default:
                     return;
@@ -79,6 +80,12 @@ namespace MapEditor.ViewModels
 
             await WebApi.UpdateData<BusinessElement>(businessElement, id.Value, entity.Url);
         }
+
+        private ICommand? _onClosing;
+        public ICommand OnClosing => _onClosing ??= new RelayCommand(f =>
+        {
+            SelectedMapElement.IsSelected = false;
+        });
 
         private ICommand? _cancelCommand;
         public ICommand CancelCommand => _cancelCommand ??= new RelayCommand(f =>
@@ -95,6 +102,7 @@ namespace MapEditor.ViewModels
             if (args[1] is not BusinessElement be) return;
             if (args[0] is not ClearType clearType) return;
             ClearBusinessElement(be,clearType);
+            
 
         });
 
@@ -103,7 +111,7 @@ namespace MapEditor.ViewModels
         {
             if (SelectedBusinessElement is null) return;
             AddMapElementToBusinessElement(SelectedBusinessElement, SelectedMapElement);
-
+            SelectedMapElement.IsLinked = true;
         }, f => SelectedBusinessElement is not null);
 
     }

@@ -4,9 +4,9 @@ using System.Windows;
 using NavigationApp.Models;
 using WebApiNET;
 
-namespace MapEditor.Models.MapElements
+namespace MapEditor.Models.MapElements.BindingMapElements
 {
-    public class VisualArea:MapElement
+    public class VisualArea : BindingMapElement
     {
         public Area Area { get; set; }
         public bool IsEditing
@@ -25,7 +25,7 @@ namespace MapEditor.Models.MapElements
 
         public double PointHeight
         {
-            get=>GetOrCreate<double>();
+            get => GetOrCreate<double>();
             set => SetAndNotify(value);
         }
 
@@ -49,15 +49,15 @@ namespace MapEditor.Models.MapElements
             IsEditing = false;
             if (IsFinished)
             {
-                await WebApi.UpdateData<Area>(Area,Area.Id.ToString());
+                await WebApi.UpdateData<Area>(Area, Area.Id.ToString());
             }
             else
             {
-                IsFinished = true;   
+                IsFinished = true;
                 var (resp, result) = await WebApi.SendData<Area>(Area);
                 Area.Id = result.Id;
             }
-            
+
         }
     }
 }

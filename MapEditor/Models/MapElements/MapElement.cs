@@ -19,11 +19,6 @@ namespace MapEditor.Models.MapElements
             set => SetAndNotify(value);
         }
 
-        public bool IsLinked
-        {
-            get => GetOrCreate<bool>();
-            set => SetAndNotify(value);
-        }
 
         public abstract Task Delete();
 

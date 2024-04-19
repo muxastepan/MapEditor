@@ -19,17 +19,17 @@ namespace MapEditor.Models
             set => SetAndNotify(value);
         }
 
-        [JsonProperty("nodes")]
-        public ObservableCollection<int> NodeField
+        [JsonProperty("node")]
+        public int? NodeField
         {
-            get => GetOrCreate<ObservableCollection<int>>();
+            get => GetOrCreate<int?>();
             set => SetAndNotify(value);
         }
 
-        [JsonProperty("areas")]
-        public ObservableCollection<int> AreasField
+        [JsonProperty("area")]
+        public int? AreaField
         {
-            get => GetOrCreate(new ObservableCollection<int>());
+            get => GetOrCreate<int?>();
             set => SetAndNotify(value);
         }
     }

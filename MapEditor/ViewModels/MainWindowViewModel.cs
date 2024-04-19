@@ -17,6 +17,7 @@ using MapEditor.Views.Controls;
 using MapEditor.Views.Windows;
 using WebApiNET;
 using WebApiNET.Utilities;
+using MapEditor.Models.MapElements.BindingMapElements;
 
 namespace MapEditor.ViewModels
 {
@@ -133,16 +134,8 @@ namespace MapEditor.ViewModels
 
         private void SelectedToolChanged(PropertyChangingArgs<ToolType> args)
         {
-            foreach (var visualNode in Nodes)
-            {
-                visualNode.IsSelected = false;
-            }
-
-            foreach (var area in Areas)
-            {
-                area.IsSelected = false;
-            }
             
+            UnselectAllMapElements();
             if(Route.Any()) Route.Clear();
             FloorRoute = new ObservableCollection<NaviPoint>();
         }
@@ -158,10 +151,28 @@ namespace MapEditor.ViewModels
         private async void LoadResources()
         {
             await GetFloors();
+            await GetBusinessElements();
             await GetAreas();
             await GetNodes();
-            await GetBusinessElements();
             if (Floors?.Count > 0) SelectedFloor = Floors[0];
+        }
+
+        private void UnselectAllMapElements()
+        {
+            foreach (var visualNode in Nodes)
+            {
+                visualNode.IsSelected = false;
+            }
+
+            foreach (var area in Areas)
+            {
+                area.IsSelected = false;
+            }
+
+            foreach (var link in Links)
+            {
+                link.IsSelected = false;
+            }
         }
 
         private async Task GetBusinessElements()
@@ -188,11 +199,10 @@ namespace MapEditor.ViewModels
                             VerboseName = declaredKey.VerboseName,
                         });
                     }
-                    if (element["nodes"] is null || element["areas"] is null) continue;
+                    if (element["node"] is null || element["area"] is null) continue;
 
-                    //newBusinessElement.NodeField = element["nodes"].ToObject<int>();
-                    newBusinessElement.NodeField = element["nodes"].ToObject<ObservableCollection<int>>();
-                    newBusinessElement.AreasField = element["areas"].ToObject<ObservableCollection<int>>();
+                    newBusinessElement.NodeField = element["node"].ToObject<int?>();
+                    newBusinessElement.AreaField = element["area"].ToObject<int?>();
 
                     businessEntity.BusinessElements.Add(newBusinessElement);
                 }
@@ -210,11 +220,20 @@ namespace MapEditor.ViewModels
         private async Task GetAreas()
         {
             var areas = await WebApi.GetData<ObservableCollection<Area>>();
+            
             foreach (var area in areas)
             {
+                var bindedBusinessEntity = Settings.NetworkSettings.BusinessEntities.FirstOrDefault(entity =>
+                    entity.BusinessElements.Any(item => item.AreaField == area.Id));
+                var bindedBusinessElement =
+                    bindedBusinessEntity?.BusinessElements.FirstOrDefault(element => element.AreaField == area.Id);
+                
+                
                 Areas.Add(new VisualArea
                 {
-                    Area = area
+                    Area = area,
+                    IsLinked = bindedBusinessElement is not null,
+                    BindedBusinessElement = bindedBusinessElement,
                 });
             }
         }
@@ -225,13 +244,19 @@ namespace MapEditor.ViewModels
             if (nodes is null) return;
             foreach (var node in nodes)
             {
+                var bindedBusinessEntity = Settings.NetworkSettings.BusinessEntities.FirstOrDefault(entity =>
+                    entity.BusinessElements.Any(item => item.NodeField == node.Id));
+                var bindedBusinessElement =
+                    bindedBusinessEntity?.BusinessElements.FirstOrDefault(element => element.NodeField == node.Id);
                 node.GetNeighbors(nodes);
                 Nodes.Add(new VisualNode
                 {
                     Height = Settings.VisualSettings.NodePointHeight,
                     Width = Settings.VisualSettings.NodePointWidth,
                     Node = node,
-                    VisualCoordinates = new Point(node.Point.X + Settings.VisualSettings.NodePointWidth /2, node.Point.Y + Settings.VisualSettings.NodePointHeight /2)
+                    VisualCoordinates = new Point(node.Point.X + Settings.VisualSettings.NodePointWidth /2, node.Point.Y + Settings.VisualSettings.NodePointHeight /2),
+                    IsLinked = bindedBusinessElement is not null,
+                    BindedBusinessElement = bindedBusinessElement,
                 });
             }
 
@@ -358,7 +383,10 @@ namespace MapEditor.ViewModels
         public ICommand LinkMapElementToBusinessElementCommand =>
             _linkMapElementToBusinessElementCommand ??= new RelayCommand(async f =>
             {
-                if(f is not MapElement me) return;
+                if(f is not BindingMapElement me) return;
+                UnselectAllMapElements();
+                me.IsSelected = true;
+                
                 var selectionWindow = new BusinessElementSelectionWindow
                 {
                     DataContext = new BusinessElementSelectionWindowViewModel

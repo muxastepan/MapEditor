@@ -3,19 +3,19 @@ using System.Windows;
 using NavigationApp.Models;
 using WebApiNET;
 
-namespace MapEditor.Models.MapElements
+namespace MapEditor.Models.MapElements.BindingMapElements
 {
-    public class VisualNode: MapElement
+    public class VisualNode : BindingMapElement
     {
 
         public Node Node { get; set; }
 
         public double Width
         {
-            get=>GetOrCreate<double>(); 
-            set=>SetAndNotify(value);
+            get => GetOrCreate<double>();
+            set => SetAndNotify(value);
         }
-        public double Height 
+        public double Height
         {
             get => GetOrCreate<double>();
             set => SetAndNotify(value);

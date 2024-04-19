@@ -6,8 +6,10 @@
         xmlns:local="clr-namespace:MapEditor.Views.Windows"
         xmlns:viewModels="clr-namespace:MapEditor.ViewModels"
         xmlns:models2="clr-namespace:MapEditor.Models"
+        xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
-        Title="BusinessElementSelectionWindow" Height="460" Width="800">
+        Title="BusinessElementSelectionWindow" Height="460" Width="800"
+        WindowStyle="ToolWindow">
     <Window.DataContext>
         <viewModels:BusinessElementSelectionWindowViewModel/>
     </Window.DataContext>
@@ -20,55 +22,10 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
-                            <StackPanel>
-                                <ItemsControl ItemsSource="{Binding Fields}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock>
-                                        <Run Text="{Binding VerboseName}"/>
-                                        <Run Text=":"/>
-                                        <Run Text="{Binding Value}"/>
-                                            </TextBlock>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                                <StackPanel Orientation="Horizontal">
-
-                                    <TextBlock Text="Связанные точки:"/>
-                                    <ItemsControl ItemsSource="{Binding NodeField}">
-                                        <ItemsControl.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <StackPanel Orientation="Horizontal"/>
-                                            </ItemsPanelTemplate>
-                                        </ItemsControl.ItemsPanel>
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <TextBlock Text="{Binding }"
-                                                   Margin="5 0 0 0"/>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="Связанные области:"/>
-                                    <ItemsControl ItemsSource="{Binding AreasField}">
-                                        <ItemsControl.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <StackPanel Orientation="Horizontal"/>
-                                            </ItemsPanelTemplate>
-                                        </ItemsControl.ItemsPanel>
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <TextBlock Text="{Binding }"
-                                                   Margin="5 0 0 0"/>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </StackPanel>
-                            </StackPanel>
+                            <ContentPresenter Content="{Binding}"/>
                             <StackPanel
                                 VerticalAlignment="Center">
-                                <Button Content="Очистить точки"
+                                <Button Content="Очистить точку"
                                         Margin="5"
                                         Command="{Binding DataContext.ClearBusinessElementCommand,
                                         RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}">
@@ -79,7 +36,7 @@
                                         </MultiBinding>
                                     </Button.CommandParameter>
                                 </Button>
-                                <Button Content="Очистить области"
+                                <Button Content="Очистить область"
                                         Margin="5"
                                         Command="{Binding DataContext.ClearBusinessElementCommand,
                                         RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}">
@@ -97,6 +54,12 @@
             </ListBox>
         </DataTemplate>
     </Window.Resources>
+    <b:Interaction.Triggers>
+        <b:EventTrigger EventName="Closing">
+            <b:InvokeCommandAction
+                Command="{Binding OnClosing}"/>
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>

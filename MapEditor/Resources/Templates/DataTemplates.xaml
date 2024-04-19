@@ -1,0 +1,29 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:models2="clr-namespace:MapEditor.Models">
+    <DataTemplate DataType="{x:Type models2:BusinessElement}">
+        <StackPanel>
+            <ItemsControl ItemsSource="{Binding Fields}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock>
+                            <Run Text="{Binding VerboseName}"/>
+                            <Run Text=":"/>
+                            <Run Text="{Binding Value}"/>
+                        </TextBlock>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock>
+                <Run Text="Связанная точка"/>
+                <Run Text=":"/>
+                <Run Text="{Binding NodeField}"/>
+            </TextBlock>
+            <TextBlock>
+                <Run Text="Связанная область"/>
+                <Run Text=":"/>
+                <Run Text="{Binding AreaField}"/>
+            </TextBlock>
+        </StackPanel>
+    </DataTemplate>
+</ResourceDictionary>
