@@ -8,6 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Images\notificationFailure.png" />
+    <None Remove="Resources\Images\notificationSuccess.png" />
+    <None Remove="Resources\Images\notificationWarning.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\WebApiNET\WebApiNET.csproj" />
   </ItemGroup>
 
@@ -19,6 +25,12 @@
     <Reference Include="Core">
       <HintPath>Libs\Core.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Images\notificationFailure.png" />
+    <Resource Include="Resources\Images\notificationSuccess.png" />
+    <Resource Include="Resources\Images\notificationWarning.png" />
   </ItemGroup>
 
 </Project>

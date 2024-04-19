@@ -7,9 +7,11 @@
         xmlns:viewModels="clr-namespace:MapEditor.ViewModels"
         xmlns:settings="clr-namespace:MapEditor.Models.Settings"
         xmlns:models="clr-namespace:MapEditor.Models"
+        xmlns:businessEntities="clr-namespace:MapEditor.Models.BusinessEntities"
         mc:Ignorable="d"
         Title="Настройки" Height="700" Width="400"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="ToolWindow">
     <Window.DataContext>
         <viewModels:SettingsWindowViewModel/>
     </Window.DataContext>
@@ -24,7 +26,7 @@
         </Style>
 
 
-        <DataTemplate DataType="{x:Type models:BusinessEntity}">
+        <DataTemplate DataType="{x:Type businessEntities:BusinessEntity}">
             <StackPanel>
                 <TextBlock Text="Наименование"/>
                 <TextBox Text="{Binding Name,Mode=TwoWay}"/>
@@ -52,7 +54,7 @@
                                           IsChecked="{Binding IsVisible,Mode=TwoWay}"/>
                                 <RadioButton 
                                     Content="Первичный ключ"
-                                    GroupName="PrimaryKey" IsChecked="{Binding IsPrimary,Mode=TwoWay}"/>
+                                    GroupName="{Binding PrimaryGroupName}" IsChecked="{Binding IsPrimary,Mode=TwoWay}"/>
                             </StackPanel>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>

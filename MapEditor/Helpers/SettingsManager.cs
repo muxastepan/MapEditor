@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using MapEditor.Models;
+using MapEditor.Models.BusinessEntities;
 using MapEditor.Models.Settings;
 
 namespace MapEditor.Helpers

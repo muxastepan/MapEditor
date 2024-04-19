@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Input;
 using Core;
 using MapEditor.Models;
+using MapEditor.Models.BusinessEntities;
 using MapEditor.Models.Settings;
 using MapEditor.Views.Windows;
 
@@ -38,7 +39,7 @@ namespace MapEditor.ViewModels
         public ICommand AddFieldCommand => _addFieldCommand ??= new RelayCommand(f =>
         {
             if(f is not BusinessEntity bo) return;
-            bo.FieldNames.Add(new Field{Key = "example",IsVisible = true});
+            bo.FieldNames.Add(new Field{Key = "example",IsVisible = true, PrimaryGroupName = bo.Url});
         });
 
         private ICommand? _addBusinessObjectCommand;

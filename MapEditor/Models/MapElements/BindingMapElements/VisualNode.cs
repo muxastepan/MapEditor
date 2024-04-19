@@ -34,9 +34,9 @@ namespace MapEditor.Models.MapElements.BindingMapElements
             set => SetAndNotify(value);
         }
 
-        public override async Task Delete()
+        public override async Task<bool> Delete()
         {
-            await WebApi.DeleteData<Node>(Node.Id.ToString());
+            return await WebApi.DeleteData<Node>(Node.Id.ToString());
         }
     }
 }

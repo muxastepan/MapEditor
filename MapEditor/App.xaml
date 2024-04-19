@@ -9,6 +9,7 @@
                     <ResourceDictionary Source="Resources/Templates/ButtonTemplates.xaml"/>        
                     <ResourceDictionary Source="Resources/GlobalConverters.xaml"/>        
                     <ResourceDictionary Source="Resources/Templates/DataTemplates.xaml"/>        
+                    <ResourceDictionary Source="/Resources/Icons.xaml"/>        
              </ResourceDictionary.MergedDictionaries>
          </ResourceDictionary>
     </Application.Resources>

@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using MapEditor.Helpers;
+using MapEditor.Models.BusinessEntities;
 using MapEditor.Models.MapElements;
 using MapEditor.Models.MapElements.Factories;
 using MapEditor.Models.Settings;
@@ -37,6 +38,7 @@ namespace MapEditor.ViewModels
             Areas.CollectionChanged += Areas_CollectionChanged;
             Links.CollectionChanged += Links_CollectionChanged;
             Settings = _settingsManager.Read();
+            NotificationService = new NotificationService(4,4);
             WebApi.Host = Settings.NetworkSettings.ApiUrl;
             WebApi.UseApiSuffix = Settings.NetworkSettings.UseApiSuffix;
             LoadResources();
@@ -46,7 +48,11 @@ namespace MapEditor.ViewModels
 
         #region Properties
 
-
+        public NotificationService NotificationService
+        {
+            get => GetOrCreate<NotificationService>();
+            set => SetAndNotify(value);
+        }
         public Settings Settings
         {
             get=>GetOrCreate<Settings>(); 
@@ -157,6 +163,55 @@ namespace MapEditor.ViewModels
             if (Floors?.Count > 0) SelectedFloor = Floors[0];
         }
 
+        private void UnlinkEmptyMapElements()
+        {
+            foreach (var bindingMapElement in Nodes.Concat<BindingMapElement>(Areas))
+            {
+                if(bindingMapElement.BindedBusinessElement is null) continue;
+                if (Settings.NetworkSettings.BusinessEntities.Any(be => be.BusinessElements.Contains(bindingMapElement.BindedBusinessElement))) continue;
+                bindingMapElement.BindedBusinessElement = null;
+                bindingMapElement.IsLinked = false;
+            }
+        }
+
+        private void LinkMapElements()
+        {
+            foreach (var visualNode in Nodes)
+            {
+                var businessEntity = Settings.NetworkSettings.BusinessEntities.FirstOrDefault(be =>
+                    be.BusinessElements.Any(element => element.NodeField == visualNode.Node.Id));
+                var businessElement =
+                    businessEntity?.BusinessElements.FirstOrDefault(element => element.NodeField == visualNode.Node.Id);
+
+                if (businessElement == null) continue;
+
+                visualNode.BindedBusinessElement = businessElement;
+                visualNode.IsLinked = true;
+            }
+
+            foreach (var visualArea in Areas)
+            {
+                var businessEntity = Settings.NetworkSettings.BusinessEntities.FirstOrDefault(be =>
+                    be.BusinessElements.Any(element => element.AreaField == visualArea.Area.Id));
+                var businessElement =
+                    businessEntity?.BusinessElements.FirstOrDefault(element => element.AreaField == visualArea.Area.Id);
+
+                if (businessElement == null) continue;
+
+                visualArea.BindedBusinessElement = businessElement;
+                visualArea.IsLinked = true;
+            }
+        }
+
+        private void ClearResources()
+        {
+            Floors.Clear();
+            FloorRoute.Clear();
+            Areas.Clear();
+            Nodes.Clear();
+            Links.Clear();
+        }
+
         private void UnselectAllMapElements()
         {
             foreach (var visualNode in Nodes)
@@ -182,6 +237,7 @@ namespace MapEditor.ViewModels
                 businessEntity.BusinessElements.Clear();
                 var fields = businessEntity.FieldNames.Select(fieldName => fieldName.Key).ToList();
                 var rawBusinessElements = await WebApi.GetDynamicDataArray(businessEntity.Url);
+                if(rawBusinessElements is null) continue;
                 foreach (var element in rawBusinessElements)
                 {
                     var newBusinessElement = new BusinessElement();
@@ -193,12 +249,14 @@ namespace MapEditor.ViewModels
                         newBusinessElement.Fields.Add(new Field
                         {
                             IsPrimary = declaredKey.IsPrimary,
+                            PrimaryGroupName = businessEntity.Url,
                             IsVisible = declaredKey.IsVisible,
                             Key = field,
                             Value = element[field].ToString(),
                             VerboseName = declaredKey.VerboseName,
                         });
                     }
+                    newBusinessElement.ParentBusinessEntity = businessEntity;
                     if (element["node"] is null || element["area"] is null) continue;
 
                     newBusinessElement.NodeField = element["node"].ToObject<int?>();
@@ -207,6 +265,7 @@ namespace MapEditor.ViewModels
                     businessEntity.BusinessElements.Add(newBusinessElement);
                 }
             }
+            LinkMapElements();
         }
         private async Task GetFloors()
         {
@@ -330,17 +389,30 @@ namespace MapEditor.ViewModels
         private async Task DeleteSelectedMapElements<T>(ICollection<T> managingCollection) where T:MapElement, new()
         {
             var selectedElements = managingCollection.Where(element => element.IsSelected).ToList();
+            bool? res = true;
+            if (selectedElements.Count == 0) res = null;
             foreach (var selectedElement in selectedElements)
             {
                 managingCollection.Remove(selectedElement);
-                await selectedElement.Delete();
+                if (!await selectedElement.Delete()) res = false;
                 if (selectedElement is VisualNode node)
                 {
                     await DeleteEmptyLinks(node);
                 }
             }
 
-            
+            switch (res)
+            {
+                case null:
+                    return;
+                case true:
+                    NotificationService.AddNotification("Выбранные элементы удалены", NotificationType.Success);
+                    break;
+                default:
+                    NotificationService.AddNotification("Выбранные элементы не удалились из-за ошибки на сервере", NotificationType.Failure);
+                    break;
+            }
+
         }
 
         private async Task DeleteEmptyLinks(VisualNode? node)
@@ -356,7 +428,7 @@ namespace MapEditor.ViewModels
 
         }
 
-        private async Task DeleteMapElement(MapElement mapElement)
+        private async Task<bool> DeleteMapElement(MapElement mapElement)
         {
             switch (mapElement)
             {
@@ -371,7 +443,7 @@ namespace MapEditor.ViewModels
                     Links.Remove(l);
                     break;
             }
-            await mapElement.Delete();
+           return await mapElement.Delete();
         }
 
         #endregion
@@ -392,7 +464,9 @@ namespace MapEditor.ViewModels
                     DataContext = new BusinessElementSelectionWindowViewModel
                     {
                         BusinessEntities = Settings.NetworkSettings.BusinessEntities,
-                        SelectedMapElement = me
+                        SelectedMapElement = me,
+                        MapElements = Areas.Concat<BindingMapElement>(Nodes),
+                        NotificationService = NotificationService
                     }
                 };
                 selectionWindow.Show();
@@ -425,6 +499,8 @@ namespace MapEditor.ViewModels
                 default:
                     return;
             }
+
+            NotificationService.AddNotification("Объект успешно создан",NotificationType.Success);
             
         });
 
@@ -451,12 +527,14 @@ namespace MapEditor.ViewModels
         {
             if (f is MapElement me)
             {
-                await DeleteMapElement(me);
+                if (await DeleteMapElement(me)) NotificationService.AddNotification("Элемент удален", NotificationType.Success);
+                else NotificationService.AddNotification("Элемент не удален из-за ошибки на сервере", NotificationType.Failure);
                 return;
             }
             switch (SelectedTool)
             {
                 case ToolType.Point:
+
                     await DeleteSelectedMapElements(Links);
                     await DeleteSelectedMapElements(Nodes);
                     break;
@@ -465,10 +543,11 @@ namespace MapEditor.ViewModels
                     if (f is NaviPoint np) CreatingArea.Area.NaviPoints.Remove(np);
                     break;
                 case ToolType.Cursor:
+
                     await DeleteSelectedMapElements(Links);
                     await DeleteSelectedMapElements(Nodes);
                     await DeleteSelectedMapElements(Areas);
-                    
+
                     break;
                 case ToolType.Hand:
                 case ToolType.Route:
@@ -500,8 +579,8 @@ namespace MapEditor.ViewModels
                     }
                 }
             }
-
-            await Link.LinkNodes(firstNode, secondNode);
+            if (await Link.LinkNodes(firstNode, secondNode)) NotificationService.AddNotification("Точки соединены", NotificationType.Success);
+            else NotificationService.AddNotification("Точки не соединены из-за ошибки на сервере", NotificationType.Failure);
 
             if (Links.Contains(Links.FirstOrDefault(link => link.From == firstNode && link.To == secondNode))) return;
             Links.Add(new Link
@@ -522,7 +601,9 @@ namespace MapEditor.ViewModels
 
         public ICommand FinishAreaCommand => _finishAreaCommand ??= new RelayCommand(async f =>
         {
-            CreatingArea.StopEditing();
+            var res= await CreatingArea.StopEditing();
+            if (res) NotificationService.AddNotification("Область создана или изменена успешно", NotificationType.Success);
+            else NotificationService.AddNotification("Область не создана или не изменена из-за ошибки на сервере", NotificationType.Failure);
             CreatingArea = null;
         });
 
@@ -559,7 +640,10 @@ namespace MapEditor.ViewModels
             switch (DraggingElement)
             {
                 case VisualNode vn:
-                    await WebApi.UpdateData<Node>(vn.Node,vn.Node.Id.ToString());
+                    var result = await WebApi.UpdateData<Node>(vn.Node,vn.Node.Id.ToString());
+                    if(result) NotificationService.AddNotification("Координаты точки изменены",NotificationType.Success);
+                    else NotificationService.AddNotification("Координаты точки не изменились из-за ошибки на сервере",NotificationType.Failure);
+                    
                     break;
             }
             
@@ -576,6 +660,7 @@ namespace MapEditor.ViewModels
             var selectedNodes = Nodes.Where(node => node.IsSelected); 
             if (count > 2)
             {
+                NotificationService.AddNotification("Выбрано больше двух точек для построения маршрута", NotificationType.Warning);
                 selectedNodes = selectedNodes.TakeLast(2);
                 foreach (var node in Nodes)
                 {
@@ -591,7 +676,12 @@ namespace MapEditor.ViewModels
             }
             Route = points;
             FloorRoute = new ObservableCollection<NaviPoint>(points.Where(point => point.Floor == SelectedFloor.Id));
-
+            if (FloorRoute.Count == 0)
+            {
+                NotificationService.AddNotification("Маршрут не построен (возможно пути не существует)", NotificationType.Failure);
+                return;
+            }
+            NotificationService.AddNotification("Маршрут успешно построен",NotificationType.Success);
         });
 
         private ICommand? _onLoaded;
@@ -613,6 +703,7 @@ namespace MapEditor.ViewModels
         private async void SettingsWindow_Closed(object? sender, EventArgs e)
         {
             _settingsManager.Write(Settings);
+            NotificationService.AddNotification("Настройки сохранены",NotificationType.Success);
             foreach (var visualNode in Nodes)
             {
                 visualNode.Height = Settings.VisualSettings.NodePointHeight;
@@ -630,12 +721,20 @@ namespace MapEditor.ViewModels
             {
                 WebApi.Host = Settings.NetworkSettings.ApiUrl;
                 WebApi.UseApiSuffix = Settings.NetworkSettings.UseApiSuffix;
+                ClearResources();
                 LoadResources();
             }
-
+            UnlinkEmptyMapElements();
             await GetBusinessElements();
 
         }
+
+        private ICommand? _openHelpWindowCommand;
+        public ICommand OpenHelpWindowCommand => _openHelpWindowCommand ??= new RelayCommand(f =>
+        {
+            var window = new HelpWindow();
+            window.Show();
+        });
 
         #endregion
     }

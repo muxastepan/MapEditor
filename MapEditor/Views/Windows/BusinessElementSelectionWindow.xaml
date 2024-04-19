@@ -7,14 +7,15 @@
         xmlns:viewModels="clr-namespace:MapEditor.ViewModels"
         xmlns:models2="clr-namespace:MapEditor.Models"
         xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:businessEntities="clr-namespace:MapEditor.Models.BusinessEntities"
         mc:Ignorable="d"
         Title="BusinessElementSelectionWindow" Height="460" Width="800"
-        WindowStyle="ToolWindow">
+        WindowStartupLocation="CenterScreen">
     <Window.DataContext>
         <viewModels:BusinessElementSelectionWindowViewModel/>
     </Window.DataContext>
     <Window.Resources>
-        <DataTemplate DataType="{x:Type models2:BusinessEntity}">
+        <DataTemplate DataType="{x:Type businessEntities:BusinessEntity}">
 
             <ListBox ItemsSource="{Binding BusinessElements}"
                      SelectedItem="{Binding DataContext.SelectedBusinessElement,RelativeSource={RelativeSource FindAncestor,AncestorType=Window},

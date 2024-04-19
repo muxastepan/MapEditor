@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using NavigationApp.Models;
 
-namespace MapEditor.Models
+namespace MapEditor.Models.BusinessEntities
 {
     public class FieldValue
     {

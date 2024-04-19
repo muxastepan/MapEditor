@@ -29,9 +29,9 @@ namespace MapEditor.Models.MapElements.BindingMapElements
             set => SetAndNotify(value);
         }
 
-        public override async Task Delete()
+        public override async Task<bool> Delete()
         {
-            await WebApi.DeleteData<Area>(Area.Id.ToString());
+            return await WebApi.DeleteData<Area>(Area.Id.ToString());
         }
 
         public void AddPoint(Point position, Floor floor)
@@ -44,20 +44,24 @@ namespace MapEditor.Models.MapElements.BindingMapElements
             });
         }
 
-        public async Task StopEditing()
+        public async Task<bool> StopEditing()
         {
             IsEditing = false;
             if (IsFinished)
             {
-                await WebApi.UpdateData<Area>(Area, Area.Id.ToString());
+                return await WebApi.UpdateData<Area>(Area, Area.Id.ToString());
             }
             else
             {
                 IsFinished = true;
                 var (resp, result) = await WebApi.SendData<Area>(Area);
+                if(result?.Id is null) return false;
+                if (resp is null) return false;
                 Area.Id = result.Id;
+                return resp.IsSuccessStatusCode;
             }
 
         }
+
     }
 }

@@ -20,7 +20,7 @@ namespace MapEditor.Models.MapElements
         }
 
 
-        public abstract Task Delete();
+        public abstract Task<bool> Delete();
 
     }
 }

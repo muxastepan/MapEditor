@@ -15,6 +15,7 @@
         xmlns:mapElements="clr-namespace:MapEditor.Models.MapElements"
         xmlns:helpers="clr-namespace:MapEditor.Helpers"
         xmlns:bindingMapElements="clr-namespace:MapEditor.Models.MapElements.BindingMapElements"
+        xmlns:businessEntities="clr-namespace:MapEditor.Models.BusinessEntities"
         mc:Ignorable="d"
         ResizeMode="NoResize"
         WindowState="Maximized"
@@ -79,6 +80,7 @@
                                 <Run Text=":"/>
                                 <Run Text="{Binding Node.Id}"/>
                             </TextBlock>
+                            <TextBlock Text="{Binding BindedBusinessElement.ParentBusinessEntity.Name}"/>
                             <ContentPresenter Content="{Binding BindedBusinessElement}"/>
                         </StackPanel>
                     </ToolTip>
@@ -233,6 +235,7 @@
                                     <Run Text=":"/>
                                     <Run Text="{Binding Area.Id}"/>
                                 </TextBlock>
+                                <TextBlock Text="{Binding BindedBusinessElement.ParentBusinessEntity.Name}"/>
                                 <ContentPresenter Content="{Binding BindedBusinessElement}"/>
                             </StackPanel>
                         </ToolTip>
@@ -277,7 +280,7 @@
             </DataTemplate.Triggers>
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type models2:BusinessEntity}">
+        <DataTemplate DataType="{x:Type businessEntities:BusinessEntity}">
             <ListBox ItemsSource="{Binding BusinessElements}"/>
         </DataTemplate>
     </Window.Resources>
@@ -299,9 +302,24 @@
                 Margin="10">
             <StackPanel
                 Margin="10">
-                <Button Content="Настройки"
-                        Command="{Binding OpenSettingsCommand}"
-                        Height="50"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="0.5*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button 
+                        Grid.Column="0"
+                        Content="Настройки"
+                            Command="{Binding OpenSettingsCommand}"
+                            Height="50"
+                        Margin="10"/>
+                    <Button
+                        Grid.Column="1"
+                        Command="{Binding OpenHelpWindowCommand}"
+                        ContentTemplate="{StaticResource InfoIcon}"
+                        Height="50"
+                        Margin="10"/>
+                </Grid>
                 <TextBlock Text="Инструменты"
                        FontSize="32"
                        HorizontalAlignment="Center"/>
@@ -414,5 +432,10 @@
                           Points="{Binding FloorRoute,Converter={StaticResource PointConverter}}"/>
             </Grid>
         </controls:ZoomBorder>
+        <ItemsControl
+            VerticalAlignment="Bottom"
+            HorizontalAlignment="Left"
+            ItemsSource="{Binding NotificationService.Notifications}">
+        </ItemsControl>
     </Grid>
 </Window>

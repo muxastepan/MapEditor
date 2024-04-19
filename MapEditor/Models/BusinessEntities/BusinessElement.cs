@@ -8,10 +8,18 @@ using Core;
 using NavigationApp.Models;
 using Newtonsoft.Json;
 
-namespace MapEditor.Models
+namespace MapEditor.Models.BusinessEntities
 {
-    public class BusinessElement:ObservableObject
+    public class BusinessElement : ObservableObject
     {
+
+        [JsonIgnore]
+        public BusinessEntity ParentBusinessEntity
+        {
+            get => GetOrCreate<BusinessEntity>();
+            set => SetAndNotify(value);
+        }
+
         [JsonIgnore]
         public ObservableCollection<Field> Fields
         {

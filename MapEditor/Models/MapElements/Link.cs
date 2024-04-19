@@ -15,7 +15,7 @@ namespace MapEditor.Models.MapElements
         public VisualNode? To { get; set; }
 
 
-        public override async Task Delete()
+        public override async Task<bool> Delete()
         {
             var from = From.Node;
             var to = To.Node;
@@ -26,20 +26,20 @@ namespace MapEditor.Models.MapElements
             from.NeighborsKeys.Remove(to.Id);
             to.NeighborsKeys.Remove(from.Id);
 
-            await WebApi.UpdateData<Node>(from, from.Id.ToString());
-            await WebApi.UpdateData<Node>(to, to.Id.ToString());
+            return await WebApi.UpdateData<Node>(from, from.Id.ToString()) && 
+                   await WebApi.UpdateData<Node>(to, to.Id.ToString());
         }
 
         
 
-        public static async Task LinkNodes(VisualNode firstNode, VisualNode secondNode)
+        public static async Task<bool> LinkNodes(VisualNode firstNode, VisualNode secondNode)
         {
             firstNode.Node.Neighbors.Add(secondNode.Node);
             secondNode.Node.Neighbors.Add(firstNode.Node);
             firstNode.Node.NeighborsKeys.Add(secondNode.Node.Id);
             secondNode.Node.NeighborsKeys.Add(firstNode.Node.Id);
 
-            await WebApi.UpdateData<Node>(firstNode.Node, firstNode.Node.Id.ToString());
+            return await WebApi.UpdateData<Node>(firstNode.Node, firstNode.Node.Id.ToString())&&
             await WebApi.UpdateData<Node>(secondNode.Node, secondNode.Node.Id.ToString());
         }
     }

@@ -6,11 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Core;
+using MapEditor.Helpers;
 using MapEditor.Models;
+using MapEditor.Models.BusinessEntities;
 using MapEditor.Models.MapElements;
 using MapEditor.Models.MapElements.BindingMapElements;
 using MapEditor.Views.Windows;
-using NavigationApp.Models;
 using WebApiNET;
 
 namespace MapEditor.ViewModels
@@ -26,6 +27,18 @@ namespace MapEditor.ViewModels
         public ObservableCollection<BusinessEntity> BusinessEntities
         {
             get => GetOrCreate<ObservableCollection<BusinessEntity>>();
+            set => SetAndNotify(value);
+        }
+
+        public NotificationService NotificationService
+        {
+            get => GetOrCreate<NotificationService>();
+            set => SetAndNotify(value);
+        }
+
+        public IEnumerable<BindingMapElement> MapElements
+        {
+            get => GetOrCreate<IEnumerable<BindingMapElement>>();
             set => SetAndNotify(value);
         }
 
@@ -45,40 +58,65 @@ namespace MapEditor.ViewModels
         {
             var entity = BusinessEntities.FirstOrDefault(item => item.BusinessElements.Contains(businessElement));
             var id = businessElement.Fields.FirstOrDefault(item => item.IsPrimary);
-            if (id is null) return;
+            if (id is null)
+            {
+                NotificationService.AddNotification("У элемента отсутсвует поле первичного ключа, проверьте настройки сети", NotificationType.Warning);
+                return;
+            };
             if (entity is null) return;
             switch (mapElement)
             {
                 case VisualNode vn:
-                    businessElement.NodeField=vn.Node.Id;
+                    UnbindMapElement(MapElements.Where(element => element is VisualNode && element.BindedBusinessElement == businessElement));
+                    businessElement.NodeField = vn.Node.Id;
                     break;
                 case VisualArea va:
+                    UnbindMapElement(MapElements.Where(element => element is VisualArea && element.BindedBusinessElement == businessElement));
                     businessElement.AreaField = va.Area.Id;
                     break;
             }
-            await WebApi.UpdateData<BusinessElement>(businessElement, id.Value, entity.Url);
+            SelectedMapElement.BindedBusinessElement = businessElement;
+            if (await WebApi.UpdateData<BusinessElement>(businessElement, id.Value, entity.Url))
+                NotificationService.AddNotification("Связь добавлена",NotificationType.Success);
+            else NotificationService.AddNotification("Связь не была добавлена из-за ошибки на сервере", NotificationType.Failure);
         }
 
-        private async void ClearBusinessElement(BusinessElement businessElement,ClearType clearType)
+        private async void ClearBusinessElement(BusinessElement businessElement, ClearType clearType)
         {
             var entity = BusinessEntities.FirstOrDefault(item => item.BusinessElements.Contains(businessElement));
             var id = businessElement.Fields.FirstOrDefault(item => item.IsPrimary);
-            if (id is null) return;
+            if (id is null)
+            {
+                NotificationService.AddNotification("У элемента отсутсвует поле первичного ключа, проверьте настройки сети", NotificationType.Warning);
+                return;
+            };
             if (entity is null) return;
-
             switch (clearType)
             {
                 case ClearType.Node:
-                    businessElement.NodeField=0;
+                    UnbindMapElement(MapElements.Where(element => element is VisualNode && element.BindedBusinessElement == businessElement));
+                    businessElement.NodeField = null;
                     break;
                 case ClearType.Area:
-                    businessElement.AreaField = 0;
+                    UnbindMapElement(MapElements.Where(element => element is VisualArea && element.BindedBusinessElement == businessElement));
+                    businessElement.AreaField = null;
                     break;
                 default:
                     return;
             }
 
-            await WebApi.UpdateData<BusinessElement>(businessElement, id.Value, entity.Url);
+            if (await WebApi.UpdateData<BusinessElement>(businessElement, id.Value, entity.Url))
+                NotificationService.AddNotification("Связь удалена", NotificationType.Success);
+            else NotificationService.AddNotification("Связь не была удалена из-за ошибки на сервере", NotificationType.Failure);
+        }
+
+        private void UnbindMapElement(IEnumerable<BindingMapElement> managingCollection)
+        {
+            foreach (var element in managingCollection)
+            {
+                element.IsLinked = false;
+                element.BindedBusinessElement = null;
+            }
         }
 
         private ICommand? _onClosing;
@@ -98,11 +136,11 @@ namespace MapEditor.ViewModels
 
         public ICommand ClearBusinessElementCommand => _clearBusinessElementCommand ??= new RelayCommand(async f =>
         {
-            if(f is not object[] args) return;
+            if (f is not object[] args) return;
             if (args[1] is not BusinessElement be) return;
             if (args[0] is not ClearType clearType) return;
-            ClearBusinessElement(be,clearType);
-            
+            ClearBusinessElement(be, clearType);
+
 
         });
 
