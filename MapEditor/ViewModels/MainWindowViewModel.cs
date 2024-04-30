@@ -313,7 +313,7 @@ namespace MapEditor.ViewModels
                     Height = Settings.VisualSettings.NodePointHeight,
                     Width = Settings.VisualSettings.NodePointWidth,
                     Node = node,
-                    VisualCoordinates = new Point(node.Point.X + Settings.VisualSettings.NodePointWidth /2, node.Point.Y + Settings.VisualSettings.NodePointHeight /2),
+                    VisualCoordinates = new Point(node.Point.X - Settings.VisualSettings.NodePointWidth /2, node.Point.Y - Settings.VisualSettings.NodePointHeight /2),
                     IsLinked = bindedBusinessElement is not null,
                     BindedBusinessElement = bindedBusinessElement,
                 });
@@ -624,9 +624,9 @@ namespace MapEditor.ViewModels
                 switch (DraggingElement)
                 {
                     case VisualNode vn:
-                        vn.Node.Point.X = pos.X - Settings.VisualSettings.NodePointWidth /2;
-                        vn.Node.Point.Y = pos.Y - Settings.VisualSettings.NodePointHeight /2;
-                        vn.VisualCoordinates = pos;
+                        vn.Node.Point.X = pos.X;
+                        vn.Node.Point.Y = pos.Y;
+                        vn.VisualCoordinates = new Point(pos.X - Settings.VisualSettings.NodePointWidth / 2, pos.Y - Settings.VisualSettings.NodePointHeight / 2);
                         break;
                     case NaviPoint np:
                         np.X = pos.X;

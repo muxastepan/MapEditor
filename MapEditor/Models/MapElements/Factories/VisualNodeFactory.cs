@@ -24,11 +24,11 @@ namespace MapEditor.Models.MapElements.Factories
                     Point = new NaviPoint
                     {
                         Floor = selectedFloor.Id,
-                        X = position.X - settings.NodePointWidth / 2,
-                        Y = position.Y - settings.NodePointHeight / 2
+                        X = position.X,
+                        Y = position.Y
                     }
                 },
-                VisualCoordinates = position
+                VisualCoordinates = new Point(position.X-settings.NodePointWidth/2,position.Y-settings.NodePointHeight/2)
             };
             var (response, result) = await WebApi.SendData<Node>(newNode.Node);
             newNode.Node.Id = result.Id;

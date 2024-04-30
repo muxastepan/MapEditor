@@ -144,10 +144,10 @@
                             StrokeThickness="{Binding DataContext.Settings.VisualSettings.LinkThickness,
                             RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}"
                             Name="Line"
-                            X1="{Binding From.VisualCoordinates.X}"
-                            Y1="{Binding From.VisualCoordinates.Y}"
-                            X2="{Binding To.VisualCoordinates.X}"
-                            Y2="{Binding To.VisualCoordinates.Y}"/>
+                            X1="{Binding From.Node.Point.X}"
+                            Y1="{Binding From.Node.Point.Y}"
+                            X2="{Binding To.Node.Point.X}"
+                            Y2="{Binding To.Node.Point.Y}"/>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
                                 <Setter TargetName="Line" Property="Stroke" Value="Orange"/>
@@ -399,8 +399,8 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemContainerStyle>
                         <Style TargetType="ContentPresenter">
-                            <Setter Property="Canvas.Left" Value="{Binding Node.Point.X}"/>
-                            <Setter Property="Canvas.Top" Value="{Binding Node.Point.Y}"/>
+                            <Setter Property="Canvas.Left" Value="{Binding VisualCoordinates.X}"/>
+                            <Setter Property="Canvas.Top" Value="{Binding VisualCoordinates.Y}"/>
                         </Style>
                     </ItemsControl.ItemContainerStyle>
                     <ItemsControl.Style>
