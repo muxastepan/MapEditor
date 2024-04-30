@@ -254,6 +254,7 @@ namespace MapEditor.ViewModels
                             Key = field,
                             Value = element[field].ToString(),
                             VerboseName = declaredKey.VerboseName,
+                            IsIndex = declaredKey.IsIndex
                         });
                     }
                     newBusinessElement.ParentBusinessEntity = businessEntity;
@@ -308,15 +309,21 @@ namespace MapEditor.ViewModels
                 var bindedBusinessElement =
                     bindedBusinessEntity?.BusinessElements.FirstOrDefault(element => element.NodeField == node.Id);
                 node.GetNeighbors(nodes);
-                Nodes.Add(new VisualNode
+                var visualNode = new VisualNode
                 {
                     Height = Settings.VisualSettings.NodePointHeight,
                     Width = Settings.VisualSettings.NodePointWidth,
                     Node = node,
-                    VisualCoordinates = new Point(node.Point.X - Settings.VisualSettings.NodePointWidth /2, node.Point.Y - Settings.VisualSettings.NodePointHeight /2),
+                    VisualCoordinates = new Point(node.Point.X - Settings.VisualSettings.NodePointWidth / 2,
+                        node.Point.Y - Settings.VisualSettings.NodePointHeight / 2),
                     IsLinked = bindedBusinessElement is not null,
                     BindedBusinessElement = bindedBusinessElement,
-                });
+                };
+                var linkedFloor = Floors.FirstOrDefault(floor=>floor.Id==node.Neighbors.FirstOrDefault(item=>item.Point.Floor!=node.Point.Floor)?.Point.Floor)?.Name;
+                if (linkedFloor is not null)
+                    visualNode.LinkedFloor = linkedFloor;
+                Nodes.Add(visualNode);
+
             }
 
             foreach (var visualNode in Nodes)
@@ -708,7 +715,7 @@ namespace MapEditor.ViewModels
             {
                 visualNode.Height = Settings.VisualSettings.NodePointHeight;
                 visualNode.Width = Settings.VisualSettings.NodePointWidth;
-                visualNode.VisualCoordinates = new Point(visualNode.Node.Point.X + Settings.VisualSettings.NodePointWidth /2, visualNode.Node.Point.Y+Settings.VisualSettings.NodePointHeight /2);
+                visualNode.VisualCoordinates = new Point(visualNode.Node.Point.X - Settings.VisualSettings.NodePointWidth /2, visualNode.Node.Point.Y-Settings.VisualSettings.NodePointHeight /2);
             }
 
             foreach (var visualArea in Areas)

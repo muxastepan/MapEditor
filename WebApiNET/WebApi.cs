@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -224,7 +225,7 @@ namespace WebApiNET
                 };
                 using var client = new HttpClient();
                 var response = await client.SendAsync(request);
-                return response.IsSuccessStatusCode;
+                return response.StatusCode == HttpStatusCode.NotFound || response.IsSuccessStatusCode;
             }
             catch (Exception e)
             {
@@ -245,7 +246,7 @@ namespace WebApiNET
                 };
                 using var client = new HttpClient();
                 var response = await client.SendAsync(request);
-                return response.IsSuccessStatusCode;
+                return response.StatusCode == HttpStatusCode.NotFound || response.IsSuccessStatusCode;
             }
             catch (Exception e)
             {

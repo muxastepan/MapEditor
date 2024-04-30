@@ -34,14 +34,6 @@ namespace MapEditor.ViewModels
             sw.Close();
         });
 
-        private ICommand? _addFieldCommand;
-
-        public ICommand AddFieldCommand => _addFieldCommand ??= new RelayCommand(f =>
-        {
-            if(f is not BusinessEntity bo) return;
-            bo.FieldNames.Add(new Field{Key = "example",IsVisible = true, PrimaryGroupName = bo.Url});
-        });
-
         private ICommand? _addBusinessObjectCommand;
         public ICommand AddBusinessObjectCommand => _addBusinessObjectCommand ??= new RelayCommand(f =>
         {

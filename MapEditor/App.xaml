@@ -10,6 +10,7 @@
                     <ResourceDictionary Source="Resources/GlobalConverters.xaml"/>        
                     <ResourceDictionary Source="Resources/Templates/DataTemplates.xaml"/>        
                     <ResourceDictionary Source="/Resources/Icons.xaml"/>        
+                    <ResourceDictionary Source="/Resources/Styles/DataGridStyles.xaml"/>        
              </ResourceDictionary.MergedDictionaries>
          </ResourceDictionary>
     </Application.Resources>

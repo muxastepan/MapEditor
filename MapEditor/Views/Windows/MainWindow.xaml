@@ -50,6 +50,7 @@
                 ToolTipService.InitialShowDelay="200"
                 ToolTipService.ShowOnDisabled="True"
                 ToolTipService.BetweenShowDelay="200"
+                FontSize="{Binding DataContext.Settings.VisualSettings.TransitiveNodeFontSize,RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}"
                 Tag="{Binding}"
                 Template="{StaticResource NodeButtonTemplate}"
                 Width="{Binding Width}"
@@ -365,13 +366,20 @@
                 HorizontalAlignment="Left"
                 Panel.ZIndex="10"
                 Margin="10">
-            <TabControl ItemsSource="{Binding Settings.NetworkSettings.BusinessEntities}">
+            <StackPanel>
+                <TextBlock Text="Объекты для связи"
+                           TextAlignment="Center"
+                           FontSize="32"/>
+                <TabControl ItemsSource="{Binding Settings.NetworkSettings.BusinessEntities}"
+                            Width="290"
+                            Height="230">
                 <TabControl.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Name}"/>
                     </DataTemplate>
                 </TabControl.ItemTemplate>
             </TabControl>
+            </StackPanel>
         </Border>
         <controls:ZoomBorder
             Width="{Binding SelectedFloor.DisposableImage.Source.Width}"

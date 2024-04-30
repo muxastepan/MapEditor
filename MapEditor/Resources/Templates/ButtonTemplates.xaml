@@ -30,7 +30,7 @@
             <TextBlock Text="{TemplateBinding Content}"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
-                       FontSize="40"/>
+                       FontSize="{TemplateBinding FontSize}"/>
         </Grid>
         <ControlTemplate.Triggers>
             <Trigger Property="IsChecked" Value="True">

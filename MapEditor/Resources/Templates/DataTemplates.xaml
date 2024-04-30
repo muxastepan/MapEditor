@@ -7,7 +7,9 @@
             <ItemsControl ItemsSource="{Binding Fields}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock>
+                        <TextBlock
+                            TextWrapping="Wrap"
+                            Visibility="{Binding IsVisible,Converter={StaticResource BooleanToVisibilityConverter}}">
                             <Run Text="{Binding VerboseName}"/>
                             <Run Text=":"/>
                             <Run Text="{Binding Value}"/>

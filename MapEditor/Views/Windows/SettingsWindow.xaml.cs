@@ -23,5 +23,11 @@ namespace MapEditor.Views.Windows
         {
             InitializeComponent();
         }
+
+        private void FrameworkElement_OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            var grid = (DataGrid)sender;
+            grid.CommitEdit(DataGridEditingUnit.Row, true);
+        }
     }
 }

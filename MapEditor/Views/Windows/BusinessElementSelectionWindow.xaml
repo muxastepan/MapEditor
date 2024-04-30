@@ -8,8 +8,9 @@
         xmlns:models2="clr-namespace:MapEditor.Models"
         xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:businessEntities="clr-namespace:MapEditor.Models.BusinessEntities"
+        xmlns:controls="clr-namespace:MapEditor.Views.Controls"
         mc:Ignorable="d"
-        Title="BusinessElementSelectionWindow" Height="460" Width="800"
+        Title="BusinessElementSelectionWindow" Height="500" Width="800"
         WindowStartupLocation="CenterScreen">
     <Window.DataContext>
         <viewModels:BusinessElementSelectionWindowViewModel/>
@@ -17,12 +18,24 @@
     <Window.Resources>
         <DataTemplate DataType="{x:Type businessEntities:BusinessEntity}">
 
-            <ListBox ItemsSource="{Binding BusinessElements}"
+            <ListBox ItemsSource="{Binding FilteredBusinessElements}"
                      SelectedItem="{Binding DataContext.SelectedBusinessElement,RelativeSource={RelativeSource FindAncestor,AncestorType=Window},
                 Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <controls:StretchyWrapPanel
+                            Width="750"
+                            StretchProportionally="True"/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
+                        <Border
+                            Background="LightGray"
+                            CornerRadius="10"
+                            Width="240">
+                        <StackPanel
+                            Margin="10">
                             <ContentPresenter Content="{Binding}"/>
                             <StackPanel
                                 VerticalAlignment="Center">
@@ -50,12 +63,17 @@
                                 </Button>
                             </StackPanel>
                         </StackPanel>
+                        </Border>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
         </DataTemplate>
     </Window.Resources>
     <b:Interaction.Triggers>
+        <b:EventTrigger EventName="Loaded">
+            <b:InvokeCommandAction
+                Command="{Binding OnLoaded}"/>
+        </b:EventTrigger>
         <b:EventTrigger EventName="Closing">
             <b:InvokeCommandAction
                 Command="{Binding OnClosing}"/>
@@ -63,12 +81,38 @@
     </b:Interaction.Triggers>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="0.1*"/>
             <RowDefinition/>
             <RowDefinition Height="0.2*"/>
         </Grid.RowDefinitions>
+        <Grid
+            Margin="10 0"
+            Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.15*"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+                <TextBlock
+                    Grid.Column="0"
+                    Text="Поиск:"
+                       FontSize="24"/>
+            <TextBox
+                FontSize="24"
+                VerticalContentAlignment="Center"
+                Grid.Column="1">
+                <b:Interaction.Triggers>
+                    <b:EventTrigger EventName="TextChanged">
+                        <b:InvokeCommandAction
+                            Command="{Binding SearchCommand}"
+                            CommandParameter="{Binding Text,RelativeSource={RelativeSource FindAncestor,AncestorType=TextBox}}"/>
+                    </b:EventTrigger>
+                </b:Interaction.Triggers>
+            </TextBox>
+        </Grid>
         <TabControl 
-            Grid.Row="0"
-            ItemsSource="{Binding BusinessEntities}">
+            Grid.Row="1"
+            ItemsSource="{Binding BusinessEntities}"
+            SelectedItem="{Binding SelectedBusinessEntity,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
             <TabControl.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Name}"/>
@@ -77,7 +121,7 @@
         </TabControl>
 
         <StackPanel
-            Grid.Row="1"
+            Grid.Row="2"
             Orientation="Horizontal"
             HorizontalAlignment="Center">
             <Button

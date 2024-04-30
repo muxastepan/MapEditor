@@ -22,6 +22,7 @@ namespace MapEditor.Helpers
                     NodePointWidth = 100,
                     AreaPointWidth = 50,
                     AreaPointHeight = 50,
+                    TransitiveNodeFontSize = 20
                 },
             };
         }

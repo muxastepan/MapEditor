@@ -38,5 +38,11 @@ namespace MapEditor.Models.Settings
             get => GetOrCreate<double>();
             set => SetAndNotify(value);
         }
+
+        public double TransitiveNodeFontSize
+        {
+            get=>GetOrCreate<double>();
+            set => SetAndNotify(value);
+        }
     }
 }

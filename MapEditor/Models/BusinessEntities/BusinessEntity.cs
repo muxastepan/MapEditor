@@ -34,5 +34,11 @@ namespace MapEditor.Models.BusinessEntities
             get => GetOrCreate(new ObservableCollection<BusinessElement>());
             set => SetAndNotify(value);
         }
+
+        public ObservableCollection<BusinessElement> FilteredBusinessElements
+        {
+            get => GetOrCreate(new ObservableCollection<BusinessElement>());
+            set => SetAndNotify(value);
+        }
     }
 }

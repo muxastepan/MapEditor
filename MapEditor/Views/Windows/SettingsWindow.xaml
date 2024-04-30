@@ -8,14 +8,16 @@
         xmlns:settings="clr-namespace:MapEditor.Models.Settings"
         xmlns:models="clr-namespace:MapEditor.Models"
         xmlns:businessEntities="clr-namespace:MapEditor.Models.BusinessEntities"
+        xmlns:controls="clr-namespace:MapEditor.Views.Controls"
         mc:Ignorable="d"
-        Title="Настройки" Height="700" Width="400"
+        Title="Настройки" Height="700" Width="580"
         WindowStartupLocation="CenterScreen"
         WindowStyle="ToolWindow">
     <Window.DataContext>
         <viewModels:SettingsWindowViewModel/>
     </Window.DataContext>
     <Window.Resources>
+        
         <Style TargetType="TextBlock">
             <Setter Property="Margin" Value="0 10 0 10"/>
             <Setter Property="FontSize" Value="16"/>
@@ -27,39 +29,82 @@
 
 
         <DataTemplate DataType="{x:Type businessEntities:BusinessEntity}">
-            <StackPanel>
-                <TextBlock Text="Наименование"/>
-                <TextBox Text="{Binding Name,Mode=TwoWay}"/>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Относительный URL"
-                               Margin="10"/>
-                    <TextBox Text="{Binding Url,Mode=TwoWay}"
-                             MinWidth="80"
-                             Margin="10"/>
-
-                    <Button Content="Добавить поле"
-                            HorizontalAlignment="Right"
-                        Command="{Binding DataContext.AddFieldCommand,RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}"
-                        CommandParameter="{Binding}"/>
-                </StackPanel>
-                <ItemsControl ItemsSource="{Binding FieldNames}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel>
-                                <TextBlock Text="Ключ поля в API"/>
-                                <TextBox Text="{Binding Key,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                                <TextBlock Text="Имя поля"/>
-                                <TextBox Text="{Binding VerboseName,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                                <CheckBox Content="Отображать поле"
-                                          IsChecked="{Binding IsVisible,Mode=TwoWay}"/>
-                                <RadioButton 
-                                    Content="Первичный ключ"
-                                    GroupName="{Binding PrimaryGroupName}" IsChecked="{Binding IsPrimary,Mode=TwoWay}"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </StackPanel>
+            <Border Background="LightGray"
+                    CornerRadius="10"
+                    MinWidth="505">
+            <Grid
+                Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.5*"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    Grid.Column="0"
+                    Grid.Row="0"
+                    Text="Наименование"/>
+                <TextBox
+                    Grid.Column="0"
+                    Grid.Row="1"
+                    Text="{Binding Name,Mode=TwoWay}"/>
+                    <TextBlock 
+                        Grid.Column="0"
+                        Text="Относительный URL"
+                        Grid.Row="2"/>
+                    <TextBox 
+                        Grid.Column="0"
+                        Grid.Row="3"
+                        Text="{Binding Url,Mode=TwoWay}"/>
+                <DataGrid
+                    Unloaded="FrameworkElement_OnUnloaded"
+                    Grid.Row="0"
+                    Grid.RowSpan="4"
+                    Margin="10"
+                    Grid.Column="1"
+                    ItemsSource="{Binding FieldNames}"
+                    AutoGenerateColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="70"
+                            Header="Ключ поля в API"
+                            HeaderStyle="{StaticResource WrappedColumnHeaderStyle}"
+                            Binding="{Binding Key,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                        <DataGridTextColumn
+                            Width="90"
+                            HeaderStyle="{StaticResource WrappedColumnHeaderStyle}"
+                            Header="Имя поля"
+                            Binding="{Binding VerboseName, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                        <DataGridCheckBoxColumn
+                            Header="Отображать"
+                            HeaderStyle="{StaticResource WrappedColumnHeaderStyle}"
+                            Width="80"
+                            Binding="{Binding IsVisible,Mode=TwoWay}"/>
+                        <DataGridTemplateColumn
+                            Width="80"
+                            HeaderStyle="{StaticResource WrappedColumnHeaderStyle}"
+                            Header="Первичный ключ">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                        <RadioButton 
+                                            HorizontalAlignment="Center"
+                                            GroupName="{Binding PrimaryGroupName}" IsChecked="{Binding IsPrimary,Mode=TwoWay}"/>
+                                </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridCheckBoxColumn
+                            HeaderStyle="{StaticResource WrappedColumnHeaderStyle}"
+                            Width="60"
+                            Header="Индекс"
+                            Binding="{Binding IsIndex,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+            </Border>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type settings:VisualSettings}">
@@ -94,6 +139,12 @@
                     <TextBlock Text="Толщина линии связи"/>
                     <TextBox Text="{Binding LinkThickness,Mode=TwoWay}"/>
                 </StackPanel>
+                <StackPanel
+                    Margin="10">
+                    <TextBlock Text="Размер шрифта точки"
+                               TextWrapping="Wrap"/>
+                    <TextBox Text="{Binding TransitiveNodeFontSize,Mode=TwoWay}"/>
+                </StackPanel>
             </UniformGrid>
         </DataTemplate>
 
@@ -112,7 +163,7 @@
 
                 <ListBox ItemsSource="{Binding BusinessEntities}"
                          MaxHeight="400"
-                             SelectedItem="{Binding DataContext.SelectedBusinessEntity,RelativeSource={RelativeSource FindAncestor,AncestorType=Window},Mode=TwoWay}"/>
+                         SelectedItem="{Binding DataContext.SelectedBusinessEntity,RelativeSource={RelativeSource FindAncestor,AncestorType=Window},Mode=TwoWay}"/>
                 <Button Content="Добавить объект"
                             Margin="0 20 0 0"
                             FontSize="20"

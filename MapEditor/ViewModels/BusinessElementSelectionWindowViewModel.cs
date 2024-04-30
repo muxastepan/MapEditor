@@ -30,6 +30,12 @@ namespace MapEditor.ViewModels
             set => SetAndNotify(value);
         }
 
+        public BusinessEntity SelectedBusinessEntity
+        {
+            get => GetOrCreate<BusinessEntity>();
+            set => SetAndNotify(value);
+        }
+
         public NotificationService NotificationService
         {
             get => GetOrCreate<NotificationService>();
@@ -119,6 +125,14 @@ namespace MapEditor.ViewModels
             }
         }
 
+        private ICommand? _onLoaded;
+        public ICommand OnLoaded => _onLoaded ??= new RelayCommand(f =>
+        {
+            if(BusinessEntities.Count==0) return;
+            SelectedBusinessEntity = BusinessEntities.First();
+            SelectedBusinessEntity.FilteredBusinessElements = SelectedBusinessEntity.BusinessElements;
+        });
+
         private ICommand? _onClosing;
         public ICommand OnClosing => _onClosing ??= new RelayCommand(f =>
         {
@@ -151,6 +165,39 @@ namespace MapEditor.ViewModels
             AddMapElementToBusinessElement(SelectedBusinessElement, SelectedMapElement);
             SelectedMapElement.IsLinked = true;
         }, f => SelectedBusinessElement is not null);
+
+        private ICommand? _searchCommand;
+
+        public ICommand SearchCommand => _searchCommand ??= new RelayCommand(f =>
+        {
+            if(f is not string text) return;
+            if (string.IsNullOrEmpty(text))
+            {
+                SelectedBusinessEntity.FilteredBusinessElements = SelectedBusinessEntity.BusinessElements;
+                return;
+            }
+
+            SelectedBusinessEntity.FilteredBusinessElements = new ObservableCollection<BusinessElement>();
+            foreach (var businessElement in SelectedBusinessEntity.BusinessElements)
+            {
+                foreach (var field in businessElement.Fields)
+                {
+                    if (!field.IsIndex) continue;
+                    if (!field.Value.Contains(text)) continue;
+                    SelectedBusinessEntity.FilteredBusinessElements.Add(businessElement);
+                }
+            }
+
+            //SelectedBusinessEntity.FilteredBusinessElements = new ObservableCollection<BusinessElement>(
+            //    from element in SelectedBusinessEntity.BusinessElements
+            //    let fields = element.Fields
+            //    where (
+            //        from field in fields 
+            //        where field.IsIndex
+            //        select field.Value).Contains(text)
+            //    select element);
+
+        });
 
     }
 }

@@ -44,5 +44,11 @@ namespace MapEditor.Models.BusinessEntities
             get => GetOrCreate<bool>();
             set => SetAndNotify(value);
         }
+
+        public bool IsIndex
+        {
+            get => GetOrCreate<bool>();
+            set => SetAndNotify(value);
+        }
     }
 }
