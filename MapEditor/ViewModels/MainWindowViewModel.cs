@@ -294,6 +294,9 @@ namespace MapEditor.ViewModels
                     Area = area,
                     IsLinked = bindedBusinessElement is not null,
                     BindedBusinessElement = bindedBusinessElement,
+                    IsFinished = true,
+                    PointWidth = Settings.VisualSettings.AreaPointWidth,
+                    PointHeight = Settings.VisualSettings.AreaPointHeight,
                 });
             }
         }

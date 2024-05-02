@@ -418,7 +418,8 @@
                 </ItemsControl>
 
                 <ItemsControl ItemsSource="{Binding Links}"
-                              Panel.ZIndex="1">
+                              Panel.ZIndex="1"
+                              Name="LinksItemsControl">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Grid/>
@@ -426,7 +427,8 @@
                     </ItemsControl.ItemsPanel>
                 </ItemsControl>
 
-                <ItemsControl ItemsSource="{Binding Areas}">
+                <ItemsControl ItemsSource="{Binding Areas}"
+                              Name="AreasItemsControl">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Canvas/>
