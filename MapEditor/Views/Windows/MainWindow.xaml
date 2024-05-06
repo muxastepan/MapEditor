@@ -437,7 +437,7 @@
                 </ItemsControl>
 
                 <Polyline Stroke="Orange"
-                          StrokeThickness="10"
+                          StrokeThickness="{Binding Settings.VisualSettings.LinkThickness}"
                           Panel.ZIndex="1"
                           Points="{Binding FloorRoute,Converter={StaticResource PointConverter}}"/>
             </Grid>
