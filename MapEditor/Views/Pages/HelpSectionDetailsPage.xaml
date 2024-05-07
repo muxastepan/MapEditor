@@ -1,0 +1,32 @@
+﻿<Page x:Class="MapEditor.Views.Pages.HelpSectionDetailsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:MapEditor.Views.Pages"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="HelpSectionDetailsPage"
+      DataContext="{Binding RelativeSource={RelativeSource Self}}">
+
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <TextBlock
+            Grid.Row="0"
+            Text="{Binding HelpSection.Title}"
+                   FontSize="24"
+                TextWrapping="Wrap"
+                   HorizontalAlignment="Center"/>
+        <ScrollViewer
+            VerticalScrollBarVisibility="Auto"
+            Grid.Row="1">
+        <TextBlock Text="{Binding HelpSection.Description}"
+                   TextWrapping="Wrap"
+                   FontSize="20"/>
+        </ScrollViewer>
+    </Grid>
+</Page>

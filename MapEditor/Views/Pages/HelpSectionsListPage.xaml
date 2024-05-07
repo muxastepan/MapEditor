@@ -1,0 +1,44 @@
+﻿<Page x:Class="MapEditor.Views.Pages.HelpSectionsListPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:MapEditor.Views.Pages"
+      xmlns:help="clr-namespace:MapEditor.Models.Help"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="HelpSectionsListPage"
+      DataContext="{Binding RelativeSource={RelativeSource Self}}">
+
+    <Page.Resources>
+        <ControlTemplate TargetType="Button" x:Key="SectionTemplate">
+            <TextBlock Text="{TemplateBinding Content}"
+                       Foreground="Blue"
+                       TextDecorations="Underline"
+                       FontSize="24"
+                       Name="TextBlock"
+                       TextWrapping="Wrap"/>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter TargetName="TextBlock" Property="Foreground" Value="OrangeRed"></Setter>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+        <DataTemplate DataType="{x:Type help:HelpCompositeSection}">
+            <Button Content="{Binding Title}"
+                    Template="{StaticResource SectionTemplate}"
+                    Command="{Binding NavigateCommand,RelativeSource={RelativeSource FindAncestor, AncestorType=Page}}"
+                    CommandParameter="{Binding}">
+            </Button>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type help:HelpSection}">
+            <Button Content="{Binding Title}"
+                    Template="{StaticResource SectionTemplate}"
+                    Command="{Binding NavigateCommand,RelativeSource={RelativeSource FindAncestor, AncestorType=Page}}"
+                    CommandParameter="{Binding}"/>
+        </DataTemplate>
+    </Page.Resources>
+    <Grid>
+        <ItemsControl ItemsSource="{Binding  HelpSectionsList}"/>
+    </Grid>
+</Page>

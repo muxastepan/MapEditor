@@ -8,10 +8,18 @@
         Title="Справка" 
         WindowStartupLocation="CenterScreen"
         Height="550" Width="400">
-    <StackPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.1*"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
         <TextBlock Text="Справка"
+                   Grid.Row="0"
                    FontSize="32"
                    HorizontalAlignment="Center"/>
-        
-    </StackPanel>
+        <Frame Name="Frame"
+               Grid.Row="1"
+               NavigationUIVisibility="Visible"
+               Margin="10"/>
+    </Grid>
 </Window>
