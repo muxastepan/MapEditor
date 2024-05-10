@@ -37,6 +37,12 @@
                     Command="{Binding NavigateCommand,RelativeSource={RelativeSource FindAncestor, AncestorType=Page}}"
                     CommandParameter="{Binding}"/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type help:VideoHelpSection}">
+            <Button Content="{Binding Title}"
+                    Template="{StaticResource SectionTemplate}"
+                    Command="{Binding NavigateCommand,RelativeSource={RelativeSource FindAncestor, AncestorType=Page}}"
+                    CommandParameter="{Binding}"/>
+        </DataTemplate>
     </Page.Resources>
     <Grid>
         <ItemsControl ItemsSource="{Binding  HelpSectionsList}"/>

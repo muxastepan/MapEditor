@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Core;
+using MapEditor.Helpers.MyNamespace;
 using MapEditor.Models.Help;
 
 namespace MapEditor.Views.Pages
@@ -37,6 +38,11 @@ namespace MapEditor.Views.Pages
             if(NavigationService is null) return;
             switch (section)
             {
+                case VideoHelpSection videoHelpSection:
+                    var window = this.FindAncestor<Window>();
+                    if (window is not null) window.WindowState = WindowState.Maximized;
+                    NavigationService.Navigate(new VideoHelpPage(videoHelpSection));
+                    break;
                 case HelpCompositeSection helpCompositeSection:
                     NavigationService.Navigate(new HelpSectionsListPage(helpCompositeSection.InnerHelpSections));
                     break;

@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace MapEditor.Models.Help
 {
-    public class HelpCompositeSection:BaseHelpSection
+    public class VideoHelpSection:HelpCompositeSection
     {
-        public List<BaseHelpSection>? InnerHelpSections { get; set; }
+        public string VideoPath { get; set; }
     }
 }
