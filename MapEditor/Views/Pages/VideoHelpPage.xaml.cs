@@ -27,6 +27,7 @@ namespace MapEditor.Views.Pages
         {
             VideoHelpSection = videoHelpSection;
             InitializeComponent();
+            MediaElement.Play();
         }
 
         public VideoHelpSection VideoHelpSection { get; set; }
@@ -51,6 +52,15 @@ namespace MapEditor.Views.Pages
             MediaElement.Position = TimeSpan.MaxValue;
 
         }, f => MediaElement.Position != MediaElement.NaturalDuration);
+
+        private ICommand? _repeatCommand;
+        public ICommand RepeatCommand => _repeatCommand ??= new RelayCommand(f =>
+        {
+            MediaElement.Position = TimeSpan.Zero;
+            References.Visibility = Visibility.Collapsed;
+            MediaElement.Play();
+
+        });
 
         private ICommand? _exitCommand;
         public ICommand ExitCommand => _exitCommand ??= new RelayCommand(f =>

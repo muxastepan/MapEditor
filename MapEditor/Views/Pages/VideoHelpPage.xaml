@@ -9,10 +9,12 @@
       Title="VideoHelpPage"
       DataContext="{Binding RelativeSource={RelativeSource Self}}">
 
-    <Grid>
+    <Grid
+        Background="Black">
         <MediaElement Source="{Binding VideoHelpSection.VideoPath}"
                       MediaEnded="MediaElement_OnMediaEnded"
-                      Name="MediaElement"/>
+                      Name="MediaElement"
+                      LoadedBehavior="Manual"/>
         <StackPanel
             VerticalAlignment="Top"
             HorizontalAlignment="Right"
@@ -21,6 +23,12 @@
                     Margin="10"
                     Padding="10"
                     Command="{Binding SkipCommand}"/>
+
+            <Button Content="Повторить"
+                    Margin="10"
+                    Padding="10"
+                    Command="{Binding RepeatCommand}"/>
+
             <Button Content="Выйти"
                     Margin="10"
                     Padding="10"

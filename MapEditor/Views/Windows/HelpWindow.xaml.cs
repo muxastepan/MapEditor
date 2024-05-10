@@ -134,110 +134,110 @@ namespace MapEditor.Views.Windows
                     new VideoHelpSection
                     {
                         Title = "Видео-справка",
-                        VideoPath = "Resources/startWork.mp4",
+                        VideoPath = "Resources/HelpVideos/startWork.mp4",
                         InnerHelpSections = new List<BaseHelpSection>
                         {
                                     new VideoHelpSection
                                     {
                                         Title = "Настроить параметры объектов API",
-                                        VideoPath = "Resources/startWork.mp4",
+                                        VideoPath = "Resources/HelpVideos/startWork.mp4",
                                         InnerHelpSections = new List<BaseHelpSection>
                                         {
                                             new VideoHelpSection
                                             {
                                                 Title = "Ключ поля в API",
-                                                VideoPath = "Resources/startWork.mp4",
+                                                VideoPath = "Resources/HelpVideos/startWork.mp4",
                                             },
                                             new VideoHelpSection
                                             {
                                                 Title = "Имя поля",
-                                                VideoPath = "Resources/startWork.mp4",
+                                                VideoPath = "Resources/HelpVideos/startWork.mp4",
                                             },
                                             new VideoHelpSection
                                             {
                                                 Title = "Отображать",
-                                                VideoPath = "Resources/startWork.mp4",
+                                                VideoPath = "Resources/HelpVideos/startWork.mp4",
                                             },
                                             new VideoHelpSection
                                             {
                                                 Title = "Первичный ключ",
-                                                VideoPath = "Resources/startWork.mp4",
+                                                VideoPath = "Resources/HelpVideos/startWork.mp4",
                                             },
                                             new VideoHelpSection
                                             {
                                                 Title = "Индекс",
-                                                VideoPath = "Resources/startWork.mp4",
+                                                VideoPath = "Resources/HelpVideos/startWork.mp4",
                                             },
                                             new VideoHelpSection
                                             {
                                                 Title = "Удалить объект",
-                                                VideoPath = "Resources/startWork.mp4"
+                                                VideoPath = "Resources/HelpVideos/startWork.mp4"
                                             }
                                         }
                                     },
                                     new VideoHelpSection
                                     {
                                         Title = "Добавить точку",
-                                        VideoPath = "Resources/startWork.mp4",
+                                        VideoPath = "Resources/HelpVideos/startWork.mp4",
                                         InnerHelpSections = new List<BaseHelpSection>
                                         {
                                             new VideoHelpSection
                                             {
                                                 Title = "Удалить точку",
-                                                VideoPath = "Resources/startWork.mp4"
+                                                VideoPath = "Resources/HelpVideos/startWork.mp4"
                                             },
                                             new VideoHelpSection
                                             {
                                                 Title = "Подвинуть точку",
-                                                VideoPath = "Resources/startWork.mp4",
+                                                VideoPath = "Resources/HelpVideos/startWork.mp4",
                                             },
                                             new VideoHelpSection
                                             {
                                                 Title = "Связать точки между собой",
-                                                VideoPath = "Resources/startWork.mp4",
+                                                VideoPath = "Resources/HelpVideos/startWork.mp4",
                                             },
                                             new VideoHelpSection
                                             {
                                                 Title = "Проверить построение маршрута",
-                                                VideoPath = "Resources/startWork.mp4",
+                                                VideoPath = "Resources/HelpVideos/startWork.mp4",
                                             },
                                             new VideoHelpSection
                                             {
                                                 Title = "Связать точку с объектом API",
-                                                VideoPath = "Resources/startWork.mp4",
+                                                VideoPath = "Resources/HelpVideos/startWork.mp4",
                                             }
                                         }
                                     },
                                     new VideoHelpSection
                                     {
                                         Title = "Добавить область",
-                                        VideoPath = "Resources/startWork.mp4",
+                                        VideoPath = "Resources/HelpVideos/startWork.mp4",
                                         InnerHelpSections = new List<BaseHelpSection>
                                         {
                                             new VideoHelpSection
                                             {
                                                 Title = "Подвинуть точку области",
-                                                VideoPath = "Resources/startWork.mp4",
+                                                VideoPath = "Resources/HelpVideos/startWork.mp4",
                                             },
                                             new VideoHelpSection{
                                                 Title = "Завершить область",
-                                                VideoPath = "Resources/startWork.mp4",
+                                                VideoPath = "Resources/HelpVideos/startWork.mp4",
                                                 InnerHelpSections = new List<BaseHelpSection>
                                                 {
                                                     new VideoHelpSection
                                                     {
                                                         Title = "Вернуться к редактированию области",
-                                                        VideoPath = "Resources/startWork.mp4",
+                                                        VideoPath = "Resources/HelpVideos/startWork.mp4",
                                                     },
                                                     new VideoHelpSection
                                                     {
                                                         Title = "Удалить область",
-                                                        VideoPath = "Resources/startWork.mp4",
+                                                        VideoPath = "Resources/HelpVideos/startWork.mp4",
                                                     },
                                                     new VideoHelpSection
                                                     {
                                                         Title = "Связать область с объектом API",
-                                                        VideoPath = "Resources/startWork.mp4",
+                                                        VideoPath = "Resources/HelpVideos/startWork.mp4",
                                                     }
                                                 }
                                             }
