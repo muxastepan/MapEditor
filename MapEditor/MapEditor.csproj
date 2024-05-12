@@ -8,13 +8,25 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\HelpVideos\addArea.mp4" />
+    <None Remove="Resources\HelpVideos\addPoint.mp4" />
     <None Remove="Resources\HelpVideos\apiSettings.mp4" />
+    <None Remove="Resources\HelpVideos\areaToAPI.mp4" />
+    <None Remove="Resources\HelpVideos\deleteArea.mp4" />
     <None Remove="Resources\HelpVideos\deleteObject.mp4" />
+    <None Remove="Resources\HelpVideos\deletePoint.mp4" />
+    <None Remove="Resources\HelpVideos\dragArea.mp4" />
+    <None Remove="Resources\HelpVideos\dragPoint.mp4" />
+    <None Remove="Resources\HelpVideos\editArea.mp4" />
     <None Remove="Resources\HelpVideos\fieldName.mp4" />
     <None Remove="Resources\HelpVideos\index.mp4" />
+    <None Remove="Resources\HelpVideos\linkPoints.mp4" />
+    <None Remove="Resources\HelpVideos\makeRoute.mp4" />
+    <None Remove="Resources\HelpVideos\pointToAPI.mp4" />
     <None Remove="Resources\HelpVideos\primaryKey.mp4" />
     <None Remove="Resources\HelpVideos\show.mp4" />
     <None Remove="Resources\HelpVideos\startWork.mp4" />
+    <None Remove="Resources\HelpVideos\stopEditingArea.mp4" />
     <None Remove="Resources\HelpVideos\verboseName.mp4" />
     <None Remove="Resources\Images\notificationFailure.png" />
     <None Remove="Resources\Images\notificationSuccess.png" />
@@ -36,13 +48,46 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Resources\HelpVideos\addArea.mp4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\HelpVideos\addPoint.mp4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\HelpVideos\areaToAPI.mp4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\HelpVideos\deleteArea.mp4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\HelpVideos\deleteObject.mp4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\HelpVideos\deletePoint.mp4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\HelpVideos\dragArea.mp4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\HelpVideos\dragPoint.mp4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\HelpVideos\editArea.mp4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\HelpVideos\fieldName.mp4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\HelpVideos\index.mp4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\HelpVideos\linkPoints.mp4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\HelpVideos\makeRoute.mp4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\HelpVideos\pointToAPI.mp4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\HelpVideos\primaryKey.mp4">
@@ -55,6 +100,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\HelpVideos\apiSettings.mp4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\HelpVideos\stopEditingArea.mp4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\HelpVideos\verboseName.mp4">
