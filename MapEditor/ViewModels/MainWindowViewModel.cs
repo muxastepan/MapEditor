@@ -678,14 +678,9 @@ namespace MapEditor.ViewModels
                 }
 
             }
-            var points = await WebApi.GetData<ObservableCollection<NaviPoint>>($"?from={selectedNodes.First().Node.Id}&to={selectedNodes.Last().Node.Id}");
-            foreach (var point in points)
-            {
-                point.X += Settings.VisualSettings.NodePointWidth /2;
-                point.Y += Settings.VisualSettings.NodePointHeight /2;
-            }
-            Route = points;
-            FloorRoute = new ObservableCollection<NaviPoint>(points.Where(point => point.Floor == SelectedFloor.Id));
+            Route = await WebApi.GetData<ObservableCollection<NaviPoint>>($"?from={selectedNodes.First().Node.Id}&to={selectedNodes.Last().Node.Id}");
+            
+            FloorRoute = new ObservableCollection<NaviPoint>(Route?.Where(point => point.Floor == SelectedFloor.Id));
             if (FloorRoute.Count == 0)
             {
                 NotificationService.AddNotification("Маршрут не построен (возможно пути не существует)", NotificationType.Failure);

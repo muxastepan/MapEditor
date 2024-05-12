@@ -27,8 +27,8 @@ namespace MapEditor.Views.Pages
         {
             VideoHelpSection = videoHelpSection;
             InitializeComponent();
-            MediaElement.Play();
         }
+
 
         public VideoHelpSection VideoHelpSection { get; set; }
 
@@ -37,7 +37,20 @@ namespace MapEditor.Views.Pages
             References.Visibility = Visibility.Visible;
         }
 
-        private ICommand? _navigateCommand;
+        private ICommand? _onLoaded;
+        public ICommand OnLoaded => _onLoaded ??= new RelayCommand(f =>
+        {
+            if (References.Visibility == Visibility.Visible)
+            {
+                MediaElement.Stop();
+            }
+            else
+            {
+                MediaElement.Play();
+            }
+        });
+
+    private ICommand? _navigateCommand;
         public ICommand NavigateCommand => _navigateCommand ??= new RelayCommand(f =>
         {
             if (f is not VideoHelpSection section) return;

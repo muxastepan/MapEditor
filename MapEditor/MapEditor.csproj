@@ -8,7 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\HelpVideos\apiSettings.mp4" />
+    <None Remove="Resources\HelpVideos\deleteObject.mp4" />
+    <None Remove="Resources\HelpVideos\fieldName.mp4" />
+    <None Remove="Resources\HelpVideos\index.mp4" />
+    <None Remove="Resources\HelpVideos\primaryKey.mp4" />
+    <None Remove="Resources\HelpVideos\show.mp4" />
     <None Remove="Resources\HelpVideos\startWork.mp4" />
+    <None Remove="Resources\HelpVideos\verboseName.mp4" />
     <None Remove="Resources\Images\notificationFailure.png" />
     <None Remove="Resources\Images\notificationSuccess.png" />
     <None Remove="Resources\Images\notificationWarning.png" />
@@ -29,7 +36,28 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Resources\HelpVideos\deleteObject.mp4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\HelpVideos\fieldName.mp4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\HelpVideos\index.mp4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\HelpVideos\primaryKey.mp4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\HelpVideos\show.mp4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\HelpVideos\startWork.mp4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\HelpVideos\apiSettings.mp4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\HelpVideos\verboseName.mp4">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Resource Include="Resources\Images\notificationFailure.png" />
