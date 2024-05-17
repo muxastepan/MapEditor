@@ -33,7 +33,11 @@ namespace MapEditor.ViewModels
         public BusinessEntity SelectedBusinessEntity
         {
             get => GetOrCreate<BusinessEntity>();
-            set => SetAndNotify(value);
+            set
+            {
+                value.FilteredBusinessElements = value.BusinessElements;
+                SetAndNotify(value);
+            }
         }
 
         public NotificationService NotificationService
@@ -130,7 +134,6 @@ namespace MapEditor.ViewModels
         {
             if(BusinessEntities.Count==0) return;
             SelectedBusinessEntity = BusinessEntities.First();
-            SelectedBusinessEntity.FilteredBusinessElements = SelectedBusinessEntity.BusinessElements;
         });
 
         private ICommand? _onClosing;
