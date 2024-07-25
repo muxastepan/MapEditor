@@ -140,7 +140,7 @@ namespace WebApiNET
                 objectWithoutId.Remove("id");
                 var content = JsonConvert.SerializeObject(objectWithoutId, jsonSettings);
 
-                var data = new StringContent(content, Encoding.UTF8, "application/json");
+                var data = new StringContent(content:content, encoding:null, mediaType:"application/json");
                 using var client = new HttpClient();
                 var response = await client.PostAsync(url, data);
                 return response;

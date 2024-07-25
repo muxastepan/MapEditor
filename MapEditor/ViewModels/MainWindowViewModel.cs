@@ -499,6 +499,16 @@ namespace MapEditor.ViewModels
             {
                 case ToolType.Point:
                     await CreateMapElement(Nodes,pos);
+                    if(Nodes.Last().Node.Id!=0)
+                    {
+                        NotificationService.AddNotification("Точка успешно создана", NotificationType.Success);
+                    }
+                    else
+                    {
+                        NotificationService.AddNotification("Точка не была создана из-за ошибки на сервере",
+                            NotificationType.Failure);
+                        Nodes.RemoveAt(Nodes.Count-1);
+                    }
                     break;
                 case ToolType.Area:
                     await CreateMapElement(Areas,pos);
@@ -509,9 +519,6 @@ namespace MapEditor.ViewModels
                 default:
                     return;
             }
-
-            NotificationService.AddNotification("Объект успешно создан",NotificationType.Success);
-            
         });
 
         private ICommand? _editAreaCommand;
@@ -612,8 +619,15 @@ namespace MapEditor.ViewModels
         public ICommand FinishAreaCommand => _finishAreaCommand ??= new RelayCommand(async f =>
         {
             var res= await CreatingArea.StopEditing();
-            if (res) NotificationService.AddNotification("Область создана или изменена успешно", NotificationType.Success);
-            else NotificationService.AddNotification("Область не создана или не изменена из-за ошибки на сервере", NotificationType.Failure);
+            if (res)
+            {
+                NotificationService.AddNotification("Область создана или изменена успешно", NotificationType.Success);
+            }
+            else
+            {
+                NotificationService.AddNotification("Область не создана или не изменена из-за ошибки на сервере",
+                    NotificationType.Failure);
+            }
             CreatingArea = null;
         });
 

@@ -51,15 +51,12 @@ namespace MapEditor.Models.MapElements.BindingMapElements
             {
                 return await WebApi.UpdateData<Area>(Area, Area.Id.ToString());
             }
-            else
-            {
-                IsFinished = true;
-                var (resp, result) = await WebApi.SendData<Area>(Area);
-                if(result?.Id is null) return false;
-                if (resp is null) return false;
-                Area.Id = result.Id;
-                return resp.IsSuccessStatusCode;
-            }
+            IsFinished = true;
+            var (resp, result) = await WebApi.SendData<Area>(Area);
+            if(result?.Id is null) return false;
+            if (resp is null) return false;
+            Area.Id = result.Id;
+            return resp.IsSuccessStatusCode;
 
         }
 

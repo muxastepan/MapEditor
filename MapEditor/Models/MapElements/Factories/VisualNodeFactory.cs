@@ -31,7 +31,7 @@ namespace MapEditor.Models.MapElements.Factories
                 VisualCoordinates = new Point(position.X-settings.NodePointWidth/2,position.Y-settings.NodePointHeight/2)
             };
             var (response, result) = await WebApi.SendData<Node>(newNode.Node);
-            newNode.Node.Id = result.Id;
+            newNode.Node.Id = result?.Id ?? 0;
             return newNode;
         }
     }
