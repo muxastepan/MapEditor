@@ -19,6 +19,7 @@ using MapEditor.Views.Windows;
 using WebApiNET;
 using WebApiNET.Utilities;
 using MapEditor.Models.MapElements.BindingMapElements;
+using Newtonsoft.Json.Linq;
 
 namespace MapEditor.ViewModels
 {
@@ -245,14 +246,20 @@ namespace MapEditor.ViewModels
                     foreach (var field in fields)
                     {
                         var declaredKey = businessEntity.FieldNames.First(item => item.Key == field);
-                        if (element[field] is null) continue;
+                        var subFields = field.Split('.');
+                        var value= element;
+                        foreach (var subField in subFields)
+                        {
+                            if (value[subField] !=null)
+                                value = value[subField];
+                        }
                         newBusinessElement.Fields.Add(new Field
                         {
                             IsPrimary = declaredKey.IsPrimary,
                             PrimaryGroupName = businessEntity.Url,
                             IsVisible = declaredKey.IsVisible,
                             Key = field,
-                            Value = element[field].ToString(),
+                            Value = value.ToString(),
                             VerboseName = declaredKey.VerboseName,
                             IsIndex = declaredKey.IsIndex
                         });
