@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Core;
 using MapEditor.Models.MapElements.BindingMapElements;
 using NavigationApp.Models;
 using WebApiNET;
@@ -14,6 +15,8 @@ namespace MapEditor.Models.MapElements
         public VisualNode? From { get; set; }
         public VisualNode? To { get; set; }
 
+
+        protected override void OnIsSelectedChanged(PropertyChangingArgs<bool> obj){}
 
         public override async Task<bool> Delete()
         {

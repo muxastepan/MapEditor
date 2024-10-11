@@ -5,4 +5,5 @@
     <converters:EqualsConverter x:Key="EqualsConverter"/>
     <converters:PointConverter x:Key="PointConverter"/>
     <converters:MultiBindingConverter x:Key="MultiBindingConverter"/>
+    <converters:ColorConverter x:Key="ColorConverter"/>
 </ResourceDictionary>

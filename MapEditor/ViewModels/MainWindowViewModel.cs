@@ -157,6 +157,7 @@ namespace MapEditor.ViewModels
         #region Methods
         private async void LoadResources()
         {
+            Settings = await _settingsManager.UpdateFromApi();
             await GetFloors();
             await GetBusinessElements();
             await GetAreas();
@@ -329,6 +330,7 @@ namespace MapEditor.ViewModels
                     IsLinked = bindedBusinessElement is not null,
                     BindedBusinessElement = bindedBusinessElement,
                 };
+                visualNode.Color = visualNode.RouteTypeColor;
                 var linkedFloor = Floors.FirstOrDefault(floor=>floor.Id==node.Neighbors.FirstOrDefault(item=>item.Point.Floor!=node.Point.Floor)?.Point.Floor)?.Name;
                 if (linkedFloor is not null)
                     visualNode.LinkedFloor = linkedFloor;

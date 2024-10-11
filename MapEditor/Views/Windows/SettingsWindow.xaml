@@ -108,44 +108,57 @@
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type settings:VisualSettings}">
-            <UniformGrid
+            <StackPanel>
+                <UniformGrid
                 Rows="3">
-                <StackPanel
+                    <StackPanel
                     Margin="10">
-                    <TextBlock Text="Ширина точки на карте"/>
-                    <TextBox Text="{Binding NodePointWidth,Mode=TwoWay}"/>
-                </StackPanel>
+                        <TextBlock Text="Ширина точки на карте"/>
+                        <TextBox Text="{Binding NodePointWidth,Mode=TwoWay}"/>
+                    </StackPanel>
 
-                <StackPanel
+                    <StackPanel
                     Margin="10">
-                    <TextBlock Text="Высота точки на карте"/>
-                    <TextBox Text="{Binding NodePointHeight,Mode=TwoWay}"/>
-                </StackPanel>
+                        <TextBlock Text="Высота точки на карте"/>
+                        <TextBox Text="{Binding NodePointHeight,Mode=TwoWay}"/>
+                    </StackPanel>
 
-                <StackPanel
+                    <StackPanel
                     Margin="10">
-                    <TextBlock Text="Ширина точки области"/>
-                    <TextBox Text="{Binding AreaPointWidth,Mode=TwoWay}"/>
-                </StackPanel>
+                        <TextBlock Text="Ширина точки области"/>
+                        <TextBox Text="{Binding AreaPointWidth,Mode=TwoWay}"/>
+                    </StackPanel>
 
-                <StackPanel
+                    <StackPanel
                     Margin="10">
-                    <TextBlock Text="Высота точки области"/>
-                    <TextBox Text="{Binding AreaPointHeight,Mode=TwoWay}"/>
-                </StackPanel>
+                        <TextBlock Text="Высота точки области"/>
+                        <TextBox Text="{Binding AreaPointHeight,Mode=TwoWay}"/>
+                    </StackPanel>
 
-                <StackPanel
+                    <StackPanel
                     Margin="10">
-                    <TextBlock Text="Толщина линии связи"/>
-                    <TextBox Text="{Binding LinkThickness,Mode=TwoWay}"/>
-                </StackPanel>
-                <StackPanel
+                        <TextBlock Text="Толщина линии связи"/>
+                        <TextBox Text="{Binding LinkThickness,Mode=TwoWay}"/>
+                    </StackPanel>
+                    <StackPanel
                     Margin="10">
-                    <TextBlock Text="Размер шрифта точки"
+                        <TextBlock Text="Размер шрифта точки"
                                TextWrapping="Wrap"/>
-                    <TextBox Text="{Binding TransitiveNodeFontSize,Mode=TwoWay}"/>
-                </StackPanel>
-            </UniformGrid>
+                        <TextBox Text="{Binding TransitiveNodeFontSize,Mode=TwoWay}"/>
+                    </StackPanel>
+                </UniformGrid>
+                <TextBlock Text="Настройки внешнего вида для типов маршрутов"
+                           Margin="10"/>
+                <ComboBox ItemsSource="{Binding RouteTypes}"
+                          Margin="10"
+                          SelectedIndex="0"
+                          SelectedItem="{Binding SelectedRouteType}"
+                          DisplayMemberPath="Name"/>
+                <TextBlock Text="Цвет точки"
+                           Margin="10"/>
+                <TextBox Text="{Binding SelectedRouteType.Color,UpdateSourceTrigger=PropertyChanged}"
+                         Margin="10"/>
+            </StackPanel>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type settings:NetworkSettings}">
@@ -173,6 +186,7 @@
                             Margin="0 10 0 0"
                             FontSize="20"
                             Command="{Binding DataContext.DeleteBusinessObjectCommand,RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}"/>
+                
             </StackPanel>
         </DataTemplate>
 

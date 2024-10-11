@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Core;
+using WebApiNET.Models;
 
 namespace MapEditor.Models.Settings
 {
@@ -44,5 +46,18 @@ namespace MapEditor.Models.Settings
             get=>GetOrCreate<double>();
             set => SetAndNotify(value);
         }
+
+        public RouteType SelectedRouteType
+        {
+            get => GetOrCreate(new RouteType());
+            set => SetAndNotify(value);
+        }
+
+        public ObservableCollection<RouteType> RouteTypes
+        {
+            get => GetOrCreate(new ObservableCollection<RouteType>());
+            set => SetAndNotify(value);
+        }
+
     }
 }

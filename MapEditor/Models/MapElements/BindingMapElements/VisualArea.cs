@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
+using Core;
 using NavigationApp.Models;
 using WebApiNET;
 
@@ -28,6 +29,8 @@ namespace MapEditor.Models.MapElements.BindingMapElements
             get => GetOrCreate<double>();
             set => SetAndNotify(value);
         }
+
+        protected override void OnIsSelectedChanged(PropertyChangingArgs<bool> obj) {}
 
         public override async Task<bool> Delete()
         {
@@ -60,5 +63,6 @@ namespace MapEditor.Models.MapElements.BindingMapElements
 
         }
 
+        protected override void OnIsLinkedChanged(PropertyChangingArgs<bool> obj){}
     }
 }

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows;
 using Newtonsoft.Json;
+using WebApiNET.Models;
 
 namespace NavigationApp.Models
 {
@@ -15,6 +16,9 @@ namespace NavigationApp.Models
 
         [JsonProperty("nodes")] 
         public List<int> NeighborsKeys { get; set; } = new();
+
+        [JsonProperty("types")] public List<RouteType> RouteTypes { get; set; } = new();
+
 
         [JsonIgnore]
         public List<Node> Neighbors { get; set; } = new();

@@ -53,6 +53,7 @@
                 FontSize="{Binding DataContext.Settings.VisualSettings.TransitiveNodeFontSize,RelativeSource={RelativeSource FindAncestor,AncestorType=Window}}"
                 Tag="{Binding}"
                 Template="{StaticResource NodeButtonTemplate}"
+                Background="{Binding Color,Converter={StaticResource ColorConverter}}"
                 Width="{Binding Width}"
                 Height="{Binding Height}"
                 Panel.ZIndex="1000"
@@ -114,14 +115,14 @@
                     </b:EventTrigger>
                 </b:Interaction.Triggers>
             </CheckBox>
-            <DataTemplate.Triggers>
+            <!--<DataTemplate.Triggers>
                 <DataTrigger Binding="{Binding IsLinked}" Value="True">
                     <Setter TargetName="CheckBox" Property="Background" Value="LightGreen"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding IsLinked}" Value="False">
                     <Setter TargetName="CheckBox" Property="Background" Value="White"/>
                 </DataTrigger>
-            </DataTemplate.Triggers>
+            </DataTemplate.Triggers>-->
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type mapElements:Link}">

@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using Nito.AsyncEx;
+using WebApiNET.Models;
 
 
 namespace WebApiNET
@@ -289,6 +290,7 @@ namespace WebApiNET
                     ObservableCollection<Area> _=>"areas",
                     Area _ => "areas",
                     ObservableCollection<NaviPoint> _=> "navigate",
+                    ObservableCollection<RouteType> _=> "node_types",
                     _ => folder
                 };
             }

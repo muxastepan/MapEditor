@@ -10,8 +10,10 @@ namespace MapEditor.Models.MapElements
         public bool IsSelected
         {
             get => GetOrCreate<bool>();
-            set => SetAndNotify(value);
+            set => SetAndNotify(value,callback:OnIsSelectedChanged);
         }
+
+        protected abstract void OnIsSelectedChanged(PropertyChangingArgs<bool> obj);
 
         public bool IsVisible
         {

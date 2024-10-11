@@ -32,11 +32,11 @@
                        VerticalAlignment="Center"
                        FontSize="{TemplateBinding FontSize}"/>
         </Grid>
-        <ControlTemplate.Triggers>
+        <!--<ControlTemplate.Triggers>
             <Trigger Property="IsChecked" Value="True">
                 <Setter TargetName="Ellipse" Property="Fill" Value="Orange"/>
             </Trigger>
-        </ControlTemplate.Triggers>
+        </ControlTemplate.Triggers>-->
     </ControlTemplate>
 
     <ControlTemplate TargetType="CheckBox" x:Key="AreaButtonTemplate">
