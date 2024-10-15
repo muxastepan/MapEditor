@@ -17,7 +17,7 @@ namespace MapEditor.Helpers
                 NetworkSettings = new NetworkSettings
                 {
                     ApiUrl = "http://127.0.0.1:8000",
-                    BusinessEntities = new ObservableCollection<BusinessEntity>(),
+                    BusinessEntities = []
                 },
                 VisualSettings = new VisualSettings
                 {
@@ -27,10 +27,7 @@ namespace MapEditor.Helpers
                     AreaPointWidth = 50,
                     AreaPointHeight = 50,
                     TransitiveNodeFontSize = 20,
-                    RouteTypes = new ObservableCollection<RouteType>
-                    {
-                        new()
-                    }
+                    RouteTypes = [new RouteType()]
                 }
             };
         }
@@ -39,12 +36,19 @@ namespace MapEditor.Helpers
         {
             var settings = Read();
             var routeTypes = await WebApi.GetData<ObservableCollection<RouteType>>();
+            if (routeTypes is null || routeTypes.Count==0)
+            {
+                settings.VisualSettings.RouteTypes.Clear();
+                return settings;
+            }
             foreach (var routeType in routeTypes)
             {
                 if(settings.VisualSettings.RouteTypes.FirstOrDefault(rt=>rt.Id==routeType.Id) is not null)
                     continue;
                 settings.VisualSettings.RouteTypes.Add(routeType);
             }
+
+            settings.VisualSettings.SelectedRouteType = settings.VisualSettings.RouteTypes.FirstOrDefault()??new RouteType();
             return settings;
         }
     }

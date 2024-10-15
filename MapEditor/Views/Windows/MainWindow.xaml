@@ -61,17 +61,29 @@
                 Visibility="{Binding IsVisible,Converter={StaticResource BooleanToVisibilityConverter}}"
                 Content="{Binding LinkedFloor}">
                 <CheckBox.Resources>
-                    <helpers:MapElementBindingProxy Data="{Binding }" x:Key="MapElementBindingProxy"/>
+                    <helpers:VisualNodeBindingProxy Data="{Binding }" x:Key="VisualNodeBindingProxy"/>
                 </CheckBox.Resources>
                 <CheckBox.ContextMenu>
                     <ContextMenu
                         Name="ContextMenu">
                         <MenuItem Header="Удалить"
                                   Command="{Binding Data.DeleteMapElementCommand,Source={StaticResource ViewModelBindingProxy}}"
-                                  CommandParameter="{Binding  Data,Source={StaticResource MapElementBindingProxy}}"/>
+                                  CommandParameter="{Binding  Data,Source={StaticResource VisualNodeBindingProxy}}"/>
                         <MenuItem Header="Привязать к объекту..."
                                   Command="{Binding Data.LinkMapElementToBusinessElementCommand,Source={StaticResource ViewModelBindingProxy}}"
-                                  CommandParameter="{Binding Data,Source={StaticResource MapElementBindingProxy}}"/>
+                                  CommandParameter="{Binding Data,Source={StaticResource VisualNodeBindingProxy}}"/>
+                        <ItemsControl ItemsSource="{Binding Data.VisualRouteTypes,Source={StaticResource VisualNodeBindingProxy}}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <CheckBox IsChecked="{Binding IsSelected}"/>
+                                        <TextBlock Text="{Binding NodeRouteType.Name}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                           
+                        </ItemsControl>
+                        
                     </ContextMenu>
                 </CheckBox.ContextMenu>
                 <CheckBox.ToolTip>
@@ -84,6 +96,9 @@
                             </TextBlock>
                             <TextBlock Text="{Binding BindedBusinessElement.ParentBusinessEntity.Name}"/>
                             <ContentPresenter Content="{Binding BindedBusinessElement}"/>
+                            <TextBlock Text="Доступные типы маршрутов:"/>
+                            <ItemsControl ItemsSource="{Binding Node.RouteTypes}"
+                                          DisplayMemberPath="Name"/>
                         </StackPanel>
                     </ToolTip>
                 </CheckBox.ToolTip>
@@ -356,6 +371,14 @@
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
+                <TextBlock Text="Тип маршрута"
+                           FontSize="32"
+                           HorizontalAlignment="Center"/>
+                <ComboBox
+                    ItemsSource="{Binding Settings.VisualSettings.RouteTypes}"
+                    SelectedItem="{Binding Settings.VisualSettings.SelectedRouteType,
+                    Mode=TwoWay}"
+                    DisplayMemberPath="Name"/>
             </StackPanel>
         </Border>
 

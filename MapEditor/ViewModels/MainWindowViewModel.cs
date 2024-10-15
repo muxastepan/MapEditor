@@ -20,6 +20,7 @@ using WebApiNET;
 using WebApiNET.Utilities;
 using MapEditor.Models.MapElements.BindingMapElements;
 using Newtonsoft.Json.Linq;
+using WebApiNET.Models;
 
 namespace MapEditor.ViewModels
 {
@@ -329,7 +330,14 @@ namespace MapEditor.ViewModels
                         node.Point.Y - Settings.VisualSettings.NodePointHeight / 2),
                     IsLinked = bindedBusinessElement is not null,
                     BindedBusinessElement = bindedBusinessElement,
+                    AllRouteTypes = Settings.VisualSettings.RouteTypes.ToList()
                 };
+                foreach (var routeType in node.RouteTypes)
+                {
+                    routeType.Color =
+                        Settings.VisualSettings.RouteTypes.FirstOrDefault(rt => rt.Id == routeType.Id)?.Color ??
+                        routeType.Color;
+                }
                 visualNode.Color = visualNode.RouteTypeColor;
                 var linkedFloor = Floors.FirstOrDefault(floor=>floor.Id==node.Neighbors.FirstOrDefault(item=>item.Point.Floor!=node.Point.Floor)?.Point.Floor)?.Name;
                 if (linkedFloor is not null)
@@ -673,7 +681,7 @@ namespace MapEditor.ViewModels
             switch (DraggingElement)
             {
                 case VisualNode vn:
-                    var result = await WebApi.UpdateData<Node>(vn.Node,vn.Node.Id.ToString());
+                    var result = await WebApi.UpdateData<NodeCreate>(vn.Node.ToCreate(),vn.Node.Id.ToString());
                     if(result) NotificationService.AddNotification("Координаты точки изменены",NotificationType.Success);
                     else NotificationService.AddNotification("Координаты точки не изменились из-за ошибки на сервере",NotificationType.Failure);
                     
@@ -701,7 +709,7 @@ namespace MapEditor.ViewModels
                 }
 
             }
-            Route = await WebApi.GetData<ObservableCollection<NaviPoint>>($"?from={selectedNodes.First().Node.Id}&to={selectedNodes.Last().Node.Id}");
+            Route = await WebApi.GetData<ObservableCollection<NaviPoint>>($"?from={selectedNodes.First().Node.Id}&to={selectedNodes.Last().Node.Id}&routeType={Settings.VisualSettings.SelectedRouteType.Id}");
             
             FloorRoute = new ObservableCollection<NaviPoint>(Route?.Where(point => point.Floor == SelectedFloor.Id));
             if (FloorRoute.Count == 0)
@@ -737,6 +745,13 @@ namespace MapEditor.ViewModels
                 visualNode.Height = Settings.VisualSettings.NodePointHeight;
                 visualNode.Width = Settings.VisualSettings.NodePointWidth;
                 visualNode.VisualCoordinates = new Point(visualNode.Node.Point.X - Settings.VisualSettings.NodePointWidth /2, visualNode.Node.Point.Y-Settings.VisualSettings.NodePointHeight /2);
+                foreach (var routeType in visualNode.Node.RouteTypes)
+                {
+                    routeType.Color =
+                        Settings.VisualSettings.RouteTypes.FirstOrDefault(rt => rt.Id == routeType.Id)?.Color ??
+                        "#FFFFFF";
+                    visualNode.Color = visualNode.RouteTypeColor;
+                }
             }
 
             foreach (var visualArea in Areas)

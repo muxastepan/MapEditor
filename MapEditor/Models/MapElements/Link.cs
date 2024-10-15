@@ -7,6 +7,7 @@ using Core;
 using MapEditor.Models.MapElements.BindingMapElements;
 using NavigationApp.Models;
 using WebApiNET;
+using WebApiNET.Models;
 
 namespace MapEditor.Models.MapElements
 {
@@ -42,8 +43,8 @@ namespace MapEditor.Models.MapElements
             firstNode.Node.NeighborsKeys.Add(secondNode.Node.Id);
             secondNode.Node.NeighborsKeys.Add(firstNode.Node.Id);
 
-            return await WebApi.UpdateData<Node>(firstNode.Node, firstNode.Node.Id.ToString())&&
-            await WebApi.UpdateData<Node>(secondNode.Node, secondNode.Node.Id.ToString());
+            return await WebApi.UpdateData<NodeCreate>(firstNode.Node.ToCreate(), firstNode.Node.Id.ToString())&&
+            await WebApi.UpdateData<NodeCreate>(secondNode.Node.ToCreate(), secondNode.Node.Id.ToString());
         }
     }
 }

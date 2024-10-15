@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using Newtonsoft.Json;
@@ -17,7 +18,7 @@ namespace NavigationApp.Models
         [JsonProperty("nodes")] 
         public List<int> NeighborsKeys { get; set; } = new();
 
-        [JsonProperty("types")] public List<RouteType> RouteTypes { get; set; } = new();
+        [JsonProperty("types")] public ObservableCollection<RouteType> RouteTypes { get; set; } = new();
 
 
         [JsonIgnore]
@@ -27,5 +28,14 @@ namespace NavigationApp.Models
         {
             Neighbors.AddRange(nodes.Where(node=>NeighborsKeys.Contains(node.Id)));
         }
+    }
+
+    public static class NodeMappers
+    {
+        public static NodeCreate ToCreate(this Node node) => new()
+        {
+            NeighborsKeys = node.NeighborsKeys, Point = node.Point,
+            RouteTypes = node.RouteTypes.Select(rt => rt.Id).ToList()
+        };
     }
 }

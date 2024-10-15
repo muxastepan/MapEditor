@@ -129,6 +129,7 @@ namespace WebApiNET
             return (response, result);
         }
 
+
         public static async Task<HttpResponseMessage?> SendData(object sendObject)
         {
            
@@ -287,6 +288,7 @@ namespace WebApiNET
                     ObservableCollection<Floor> _ => "floors",
                     List<Node> _=> "nodes",
                     Node _ => "nodes",
+                    NodeCreate _=>"nodes",
                     ObservableCollection<Area> _=>"areas",
                     Area _ => "areas",
                     ObservableCollection<NaviPoint> _=> "navigate",

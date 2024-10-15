@@ -28,12 +28,13 @@ namespace MapEditor.Models.MapElements.Factories
                         X = position.X,
                         Y = position.Y
                     },
-                    RouteTypes = settings.RouteTypes.ToList()
+                    RouteTypes = [..settings.RouteTypes]
                 },
+                AllRouteTypes = settings.RouteTypes.ToList(),
                 VisualCoordinates = new Point(position.X-settings.NodePointWidth/2,position.Y-settings.NodePointHeight/2)
             };
             newNode.Color = newNode.RouteTypeColor;
-            var (response, result) = await WebApi.SendData<Node>(newNode.Node);
+            var (response, result) = await WebApi.SendData<Node>(newNode.Node.ToCreate());
             newNode.Node.Id = result?.Id ?? 0;
             return newNode;
         }
