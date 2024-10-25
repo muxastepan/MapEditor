@@ -36,11 +36,8 @@ namespace MapEditor.Helpers
         {
             var settings = Read();
             var routeTypes = await WebApi.GetData<ObservableCollection<RouteType>>();
-            if (routeTypes is null || routeTypes.Count==0)
-            {
-                settings.VisualSettings.RouteTypes.Clear();
-                return settings;
-            }
+            settings.VisualSettings.RouteTypes.Clear();
+            if (routeTypes is null) return settings;
             foreach (var routeType in routeTypes)
             {
                 if(settings.VisualSettings.RouteTypes.FirstOrDefault(rt=>rt.Id==routeType.Id) is not null)
