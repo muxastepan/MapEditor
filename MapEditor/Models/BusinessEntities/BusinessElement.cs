@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Core;
-using NavigationApp.Models;
 using Newtonsoft.Json;
 
 namespace MapEditor.Models.BusinessEntities

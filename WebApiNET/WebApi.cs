@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
-using NavigationApp.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
@@ -291,7 +290,7 @@ namespace WebApiNET
                     NodeCreate _=>"nodes",
                     ObservableCollection<Area> _=>"areas",
                     Area _ => "areas",
-                    ObservableCollection<NaviPoint> _=> "navigate",
+                    Route _=> "navigate",
                     ObservableCollection<RouteType> _=> "node_types",
                     _ => folder
                 };

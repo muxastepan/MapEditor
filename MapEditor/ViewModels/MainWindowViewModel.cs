@@ -1,6 +1,5 @@
 ﻿using Core;
 using MapEditor.Models;
-using NavigationApp.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -709,7 +708,8 @@ namespace MapEditor.ViewModels
                 }
 
             }
-            Route = await WebApi.GetData<ObservableCollection<NaviPoint>>($"?from={selectedNodes.First().Node.Id}&to={selectedNodes.Last().Node.Id}&routeType={Settings.VisualSettings.SelectedRouteType.Id}");
+            var route = await WebApi.GetData<Route>($"?from={selectedNodes.First().Node.Id}&to={selectedNodes.Last().Node.Id}&routeType={Settings.VisualSettings.SelectedRouteType.Id}");
+            Route = new ObservableCollection<NaviPoint>(route?.Points??Enumerable.Empty<NaviPoint>());
             
             FloorRoute = new ObservableCollection<NaviPoint>(Route?.Where(point => point.Floor == SelectedFloor.Id));
             if (FloorRoute.Count == 0)
@@ -717,7 +717,7 @@ namespace MapEditor.ViewModels
                 NotificationService.AddNotification("Маршрут не построен (возможно пути не существует)", NotificationType.Failure);
                 return;
             }
-            NotificationService.AddNotification("Маршрут успешно построен",NotificationType.Success);
+            NotificationService.AddNotification($"Маршрут успешно построен\nДистанция: {route?.Distance} м\nВремя: {route?.Time:HH:mm:ss}",NotificationType.Success);
         });
 
         private ICommand? _onLoaded;

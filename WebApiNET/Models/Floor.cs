@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using WebApiNET.Utilities;
 
-namespace NavigationApp.Models
+namespace WebApiNET.Models
 {
     public class Floor:ObservableObject
     {

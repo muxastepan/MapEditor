@@ -3,7 +3,6 @@ using System.Linq;
 using System.Windows.Documents;
 using Core;
 using MapEditor.Helpers;
-using NavigationApp.Models;
 using WebApiNET;
 using WebApiNET.Models;
 

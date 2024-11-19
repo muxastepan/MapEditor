@@ -1,9 +1,9 @@
-﻿using Core;
-using Newtonsoft.Json;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using Core;
+using Newtonsoft.Json;
 
-namespace NavigationApp.Models
+namespace WebApiNET.Models
 {
     public class Area:ObservableObject
     {

@@ -5,7 +5,6 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using Core;
 using MapEditor.Models.MapElements.BindingMapElements;
-using NavigationApp.Models;
 using WebApiNET;
 using WebApiNET.Models;
 

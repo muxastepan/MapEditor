@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
-using NavigationApp.Models;
+using WebApiNET.Models;
 
 namespace MapEditor.Converters
 {

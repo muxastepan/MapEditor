@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Core;
-using NavigationApp.Models;
 using WebApiNET;
 using WebApiNET.Models;
 

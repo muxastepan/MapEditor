@@ -1,5 +1,4 @@
-﻿using NavigationApp.Models;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace WebApiNET.Models;
 

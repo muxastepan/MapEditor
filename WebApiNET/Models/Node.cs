@@ -1,11 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows;
+﻿using System.Collections.ObjectModel;
 using Newtonsoft.Json;
-using WebApiNET.Models;
 
-namespace NavigationApp.Models
+namespace WebApiNET.Models
 {
     public class Node
     {
