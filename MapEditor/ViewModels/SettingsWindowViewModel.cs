@@ -13,6 +13,9 @@ using MapEditor.Views.Windows;
 
 namespace MapEditor.ViewModels
 {
+    /// <summary>
+    /// Класс бизнес-логики окна настроек.
+    /// </summary>
     public class SettingsWindowViewModel:ObservableObject
     {
         public Settings Settings
@@ -28,6 +31,9 @@ namespace MapEditor.ViewModels
         }
 
         private ICommand? _closeCommand;
+        /// <summary>
+        /// Закрывает окно.
+        /// </summary>
         public ICommand CloseCommand => _closeCommand ??= new RelayCommand(f =>
         {
             if(f is not SettingsWindow sw) return;
@@ -35,12 +41,18 @@ namespace MapEditor.ViewModels
         });
 
         private ICommand? _addBusinessObjectCommand;
+        /// <summary>
+        /// Добавляет сущность с сервера.
+        /// </summary>
         public ICommand AddBusinessObjectCommand => _addBusinessObjectCommand ??= new RelayCommand(f =>
         {
             Settings.NetworkSettings.BusinessEntities.Add(new BusinessEntity());
         });
 
         private ICommand? _deleteBusinessObjectCommand;
+        /// <summary>
+        /// Удаляет сущность.
+        /// </summary>
         public ICommand DeleteBusinessObjectCommand => _deleteBusinessObjectCommand ??= new RelayCommand(f =>
         {
             Settings.NetworkSettings.BusinessEntities.Remove(SelectedBusinessEntity);

@@ -9,6 +9,9 @@ using Newtonsoft.Json;
 
 namespace NavigationApp.Models
 {
+    /// <summary>
+    /// Модель точки.
+    /// </summary>
     public class NaviPoint:ObservableObject
     {
 

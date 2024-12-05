@@ -4,8 +4,13 @@ using MapEditor.Models.Settings;
 
 namespace MapEditor.Helpers
 {
+    /// <summary>
+    /// Менеджер настроек.
+    /// </summary>
+    /// <inheritdoc cref="JsonManager{T}"/>
     public class SettingsManager: JsonManager<Settings>
     {
+        /// <inheritdoc cref="JsonManager{T}"/>
         public SettingsManager(string path) : base(path)
         {
             DefaultValue = new Settings

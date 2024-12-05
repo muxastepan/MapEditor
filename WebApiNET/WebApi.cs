@@ -15,6 +15,9 @@ using Nito.AsyncEx;
 
 namespace WebApiNET
 {
+    /// <summary>
+    /// Класс для взаимодействия с сервером.
+    /// </summary>
     public class WebApi
     {
         public static string Host { get; set; } = File.Exists("host.txt") ? File.ReadAllText("host.txt") : "http://127.0.0.1:8000";
@@ -34,6 +37,9 @@ namespace WebApiNET
         }
 
 
+        /// <summary>
+        /// Получает ответ с сервера в виде динамического JSON-объекта.
+        /// </summary>
         public static async Task<JArray?> GetDynamicDataArray(string route)
         {
             try
@@ -49,7 +55,11 @@ namespace WebApiNET
             }
         }
 
-
+        /// <summary>
+        /// GET-запрос.
+        /// </summary>
+        /// <param name="addedParams">Параметры запроса</param>
+        /// <param name="mediaType">Content-Type заголовок</param>
         public static async Task<T?> GetData<T>(string addedParams = null, string mediaType = "application/json") where T : new()
         {
             if (!Directory.Exists("CacheData"))
@@ -98,29 +108,10 @@ namespace WebApiNET
         }
 
 
-        public static async Task<bool> LoadFile<T>(string filePath, string requestField = "file", List<Tuple<string, string>>? stringContents = null, string addedParams = "") where T : new()
-        {
-            var route = GetRouteStr(new T());
-            var url = $"{Host}/{(UseApiSuffix?"api":string.Empty)}/{route}/{addedParams}";
-
-            using var multipartFormContent = new MultipartFormDataContent();
-            var fileStreamContent = new StreamContent(File.OpenRead(filePath));
-            fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("image/png");
-            multipartFormContent.Add(fileStreamContent, name: requestField, fileName: Path.GetFileName(filePath));
-            if (stringContents != null)
-                foreach (var content in stringContents)
-                {
-                    multipartFormContent.Add(new StringContent(content.Item2), content.Item1);
-                }
-
-            using var httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
-
-            var response = await httpClient.PostAsync(url, multipartFormContent);
-            response.EnsureSuccessStatusCode();
-            return response.IsSuccessStatusCode;
-        }
-
+        /// <summary>
+        /// POST-запрос.
+        /// </summary>
+        /// <param name="sendObject">Объект - тело запроса</param>
         public static async Task<(HttpResponseMessage?, TResult?)> SendData<TResult>(object sendObject)
         {
             var response = await SendData(sendObject);
@@ -128,6 +119,10 @@ namespace WebApiNET
             return (response, result);
         }
 
+        /// <summary>
+        /// POST-запрос.
+        /// </summary>
+        /// <param name="sendObject">Объект - тело запроса</param>
         public static async Task<HttpResponseMessage?> SendData(object sendObject)
         {
            
@@ -151,6 +146,9 @@ namespace WebApiNET
             }
         }
 
+        /// <summary>
+        /// Пытается десериализовать ответ от сервера.
+        /// </summary>
         public static async Task<T?> TryGetResult<T>(HttpResponseMessage? response)
         {
             try
@@ -164,24 +162,9 @@ namespace WebApiNET
             }
         }
 
-        public static async Task<bool> ReplaceData<T>(Dictionary<string, dynamic> sendObject, string addedParams = "") where T : new()
-        {
-            var content = new StringContent(JsonConvert.SerializeObject(sendObject), Encoding.UTF8, "application/merge-patch+json");
-            try
-            {
-                var route = GetRouteStr(new T());
-                var url = $"{Host}/{(UseApiSuffix ? "api" : string.Empty)}/{route}/{addedParams}";
-                using var client = new HttpClient();
-                var response = await client.PatchAsync(url, content);
-                var result = await response.Content.ReadAsStringAsync();
-                return response.IsSuccessStatusCode;
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-        }
-
+        /// <summary>
+        /// PATCH-запрос.
+        /// </summary>
         public static async Task<bool> UpdateData<T>(object updateObject, string id, string route) where T : new()
         {
             try
@@ -207,6 +190,9 @@ namespace WebApiNET
             }
         }
 
+        /// <summary>
+        /// PATCH-запрос.
+        /// </summary>
         public static async Task<bool> UpdateData<T>(object updateObject,string id) where T : new()
         {
             try
@@ -233,6 +219,9 @@ namespace WebApiNET
             }
         }
 
+        /// <summary>
+        /// DELETE-запрос.
+        /// </summary>
         public static async Task<bool> DeleteData<T>(string id) where T : new()
         {
             try
@@ -253,21 +242,6 @@ namespace WebApiNET
                 return false;
             }
 
-        }
-
-        //private static TaskController _lasTaskController;
-        //private static readonly AsyncLock Mutex = new AsyncLock();
-        public static async Task<bool> Ping()
-        {
-            try
-            {
-                await HttpClient.GetStringAsync(Host + "/api");
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-            return true;
         }
 
 
@@ -296,7 +270,9 @@ namespace WebApiNET
         }
 
         private static readonly AsyncLock _mutex = new AsyncLock();
-
+        /// <summary>
+        /// Загружает картинку.
+        /// </summary>
         public static async Task<string> DownloadIFile(string uri,string localPath = "AllImages",UriKind uriKind=UriKind.Relative)
         {
             try

@@ -10,9 +10,14 @@ using Newtonsoft.Json;
 
 namespace MapEditor.Models.BusinessEntities
 {
+    /// <summary>
+    /// Экземпляр сущности из Web API.
+    /// </summary>
     public class BusinessElement : ObservableObject
     {
-
+        /// <summary>
+        /// Сущность, к которой принадлежит экземпляр.
+        /// </summary>
         [JsonIgnore]
         public BusinessEntity ParentBusinessEntity
         {
@@ -20,6 +25,9 @@ namespace MapEditor.Models.BusinessEntities
             set => SetAndNotify(value);
         }
 
+        /// <summary>
+        /// Поля экземпляра.
+        /// </summary>
         [JsonIgnore]
         public ObservableCollection<Field> Fields
         {
@@ -27,6 +35,9 @@ namespace MapEditor.Models.BusinessEntities
             set => SetAndNotify(value);
         }
 
+        /// <summary>
+        /// Поля точки.
+        /// </summary>
         [JsonProperty("node")]
         public int? NodeField
         {
@@ -34,6 +45,9 @@ namespace MapEditor.Models.BusinessEntities
             set => SetAndNotify(value);
         }
 
+        /// <summary>
+        /// Поля области.
+        /// </summary>
         [JsonProperty("area")]
         public int? AreaField
         {

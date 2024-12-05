@@ -11,8 +11,12 @@ using WebApiNET;
 
 namespace MapEditor.Models.MapElements.Factories
 {
+    /// <summary>
+    /// Класс для создания точки.
+    /// </summary>
     public class VisualNodeFactory:MapElementFactory
     {
+        ///<inheritdoc cref="MapElementFactory"/>
         public override async Task<MapElement> Create(Point position, VisualSettings settings, Floor selectedFloor)
         {
             var newNode = new VisualNode

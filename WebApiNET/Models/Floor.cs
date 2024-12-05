@@ -4,6 +4,9 @@ using WebApiNET.Utilities;
 
 namespace NavigationApp.Models
 {
+    /// <summary>
+    /// Модель этажа.
+    /// </summary>
     public class Floor:ObservableObject
     {
         [JsonProperty("id")]

@@ -6,6 +6,9 @@ using WebApiNET;
 
 namespace MapEditor.Models.MapElements.BindingMapElements
 {
+    /// <summary>
+    /// UI элемент области.
+    /// </summary>
     public class VisualArea : BindingMapElement
     {
         public Area Area { get; set; }
@@ -29,11 +32,17 @@ namespace MapEditor.Models.MapElements.BindingMapElements
             set => SetAndNotify(value);
         }
 
+        /// <summary>
+        /// Удаляет область на сервере.
+        /// </summary>
         public override async Task<bool> Delete()
         {
             return await WebApi.DeleteData<Area>(Area.Id.ToString());
         }
 
+        /// <summary>
+        /// Добавляет точку к области.
+        /// </summary>
         public void AddPoint(Point position, Floor floor)
         {
             Area.NaviPoints.Add(new NaviPoint
@@ -44,6 +53,9 @@ namespace MapEditor.Models.MapElements.BindingMapElements
             });
         }
 
+        /// <summary>
+        /// Прекратить редактирование области и отправить изменения на сервер.
+        /// </summary>
         public async Task<bool> StopEditing()
         {
             IsEditing = false;

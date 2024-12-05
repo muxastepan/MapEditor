@@ -9,12 +9,17 @@ using WebApiNET;
 
 namespace MapEditor.Models.MapElements
 {
+    /// <summary>
+    /// Связь двух точек.
+    /// </summary>
     public class Link:MapElement
     {
         public VisualNode? From { get; set; }
         public VisualNode? To { get; set; }
 
-
+        /// <summary>
+        /// Удаляет связь на сервере.
+        /// </summary>
         public override async Task<bool> Delete()
         {
             var from = From.Node;
@@ -30,8 +35,10 @@ namespace MapEditor.Models.MapElements
                    await WebApi.UpdateData<Node>(to, to.Id.ToString());
         }
 
-        
 
+        /// <summary>
+        /// Связывает две точки и отправляет изменения на сервер.
+        /// </summary>
         public static async Task<bool> LinkNodes(VisualNode firstNode, VisualNode secondNode)
         {
             firstNode.Node.Neighbors.Add(secondNode.Node);

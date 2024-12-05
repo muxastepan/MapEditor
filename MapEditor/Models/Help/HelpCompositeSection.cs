@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace MapEditor.Models.Help
 {
+    /// <summary>
+    /// Раздел справки с подразделами.
+    /// </summary>
     public class HelpCompositeSection:BaseHelpSection
     {
         public List<BaseHelpSection>? InnerHelpSections { get; set; }

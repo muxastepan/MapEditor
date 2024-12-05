@@ -11,8 +11,12 @@ using NavigationApp.Models;
 
 namespace MapEditor.Models.MapElements.Factories
 {
+    /// <summary>
+    /// Класс для создания области.
+    /// </summary>
     public class VisualAreaFactory:MapElementFactory
     {
+        /// <inheritdoc cref="MapElementFactory"/>
         public override async Task<MapElement> Create(Point position, VisualSettings settings, Floor selectedFloor)
         {
             

@@ -5,6 +5,9 @@ using NavigationApp.Models;
 
 namespace MapEditor.Models.MapElements
 {
+    /// <summary>
+    /// Базовый класс для UI элементов на карте.
+    /// </summary>
     public abstract class MapElement:ObservableObject
     {
         public bool IsSelected

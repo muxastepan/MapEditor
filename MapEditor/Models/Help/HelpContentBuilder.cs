@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace MapEditor.Models.Help.ContentBuilders
 {
+    /// <summary>
+    /// Класс контента справки.
+    /// </summary>
     public static class HelpContentBuilder
     {
         public static List<BaseHelpSection> BuildContent()

@@ -23,6 +23,9 @@ using Newtonsoft.Json.Linq;
 
 namespace MapEditor.ViewModels
 {
+    /// <summary>
+    /// Тип выбранного инструмента.
+    /// </summary>
     public enum ToolType
     {
         Cursor,
@@ -32,8 +35,14 @@ namespace MapEditor.ViewModels
         Route
     }
 
+    /// <summary>
+    /// Класс бизнес-логики основного окна.
+    /// </summary>
     public class MainWindowViewModel : ObservableObject
     {
+        /// <summary>
+        /// Конструктор класса бизнес-логики основного окна.
+        /// </summary>
         public MainWindowViewModel()
         {
             Areas.CollectionChanged += Areas_CollectionChanged;
@@ -96,6 +105,9 @@ namespace MapEditor.ViewModels
             set => SetAndNotify(value);
         }
 
+        /// <summary>
+        /// Объект, который находится в состоянии перетаскивания.
+        /// </summary>
         public object? DraggingElement
         {
             get => GetOrCreate<object>();
@@ -155,6 +167,10 @@ namespace MapEditor.ViewModels
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Загружает с сервера данные.
+        /// </summary>
         private async void LoadResources()
         {
             await GetFloors();
@@ -164,6 +180,9 @@ namespace MapEditor.ViewModels
             if (Floors?.Count > 0) SelectedFloor = Floors[0];
         }
 
+        /// <summary>
+        /// Убирает связывание с пустых элементов.
+        /// </summary>
         private void UnlinkEmptyMapElements()
         {
             foreach (var bindingMapElement in Nodes.Concat<BindingMapElement>(Areas))
@@ -175,6 +194,9 @@ namespace MapEditor.ViewModels
             }
         }
 
+        /// <summary>
+        /// Связывает элементы карты.
+        /// </summary>
         private void LinkMapElements()
         {
             foreach (var visualNode in Nodes)
@@ -204,6 +226,9 @@ namespace MapEditor.ViewModels
             }
         }
 
+        /// <summary>
+        /// Очищает все данные сервера из памяти.
+        /// </summary>
         private void ClearResources()
         {
             Floors.Clear();
@@ -213,6 +238,9 @@ namespace MapEditor.ViewModels
             Links.Clear();
         }
 
+        /// <summary>
+        /// Сбрасывает выбор со всех элементов.
+        /// </summary>
         private void UnselectAllMapElements()
         {
             foreach (var visualNode in Nodes)
@@ -231,6 +259,9 @@ namespace MapEditor.ViewModels
             }
         }
 
+        /// <summary>
+        /// Загружает сущности с сервера.
+        /// </summary>
         private async Task GetBusinessElements()
         {
             foreach (var businessEntity in Settings.NetworkSettings.BusinessEntities)
@@ -275,6 +306,10 @@ namespace MapEditor.ViewModels
             }
             LinkMapElements();
         }
+
+        /// <summary>
+        /// Загружает этажи с сервера.
+        /// </summary>
         private async Task GetFloors()
         {
             Floors = await WebApi.GetData<ObservableCollection<Floor>>();
@@ -284,6 +319,9 @@ namespace MapEditor.ViewModels
             }
         }
 
+        /// <summary>
+        /// Загружает области с сервера.
+        /// </summary>
         private async Task GetAreas()
         {
             var areas = await WebApi.GetData<ObservableCollection<Area>>();
@@ -308,6 +346,9 @@ namespace MapEditor.ViewModels
             }
         }
 
+        /// <summary>
+        /// Загружает точки с сервера.
+        /// </summary>
         private async Task GetNodes()
         {
             var nodes = await WebApi.GetData<List<Node>>();
@@ -350,6 +391,9 @@ namespace MapEditor.ViewModels
             }
         }
 
+        /// <summary>
+        /// Фильтрует элементы карты по этажам.
+        /// </summary>
         private void FilterMapElementsByFloor()
         {
             if(SelectedFloor is null) return;
@@ -372,6 +416,9 @@ namespace MapEditor.ViewModels
         }
 
 
+        /// <summary>
+        /// Создает объект на карте.
+        /// </summary>
         private async Task<MapElement> ExecuteMapElementFactoryCreator<T>(ICollection<T> managingCollection,
             Point position, MapElementFactory factory) where T : MapElement, new()
         {
@@ -380,6 +427,9 @@ namespace MapEditor.ViewModels
             return element;
         }
 
+        /// <summary>
+        /// Создает объект на карте.
+        /// </summary>
         private async Task CreateMapElement<T>(ICollection<T> managingCollection,Point position) where T : MapElement, new()
         {
             object obj = new T();
@@ -403,6 +453,9 @@ namespace MapEditor.ViewModels
             };
         }
 
+        /// <summary>
+        /// Удаляет выбранный объект на карте.
+        /// </summary>
         private async Task DeleteSelectedMapElements<T>(ICollection<T> managingCollection) where T:MapElement, new()
         {
             var selectedElements = managingCollection.Where(element => element.IsSelected).ToList();
@@ -432,6 +485,9 @@ namespace MapEditor.ViewModels
 
         }
 
+        /// <summary>
+        /// Удаляет пустые связи объектов на карте.
+        /// </summary>
         private async Task DeleteEmptyLinks(VisualNode? node)
         {
             if(node is null) return;
@@ -445,6 +501,9 @@ namespace MapEditor.ViewModels
 
         }
 
+        /// <summary>
+        /// Удаляет объект на карте.
+        /// </summary>
         private async Task<bool> DeleteMapElement(MapElement mapElement)
         {
             switch (mapElement)
@@ -469,6 +528,9 @@ namespace MapEditor.ViewModels
 
         private ICommand? _linkMapElementToBusinessElementCommand;
 
+        /// <summary>
+        /// Связывает объект на карте с сущностью сервера.
+        /// </summary>
         public ICommand LinkMapElementToBusinessElementCommand =>
             _linkMapElementToBusinessElementCommand ??= new RelayCommand(async f =>
             {
@@ -491,6 +553,9 @@ namespace MapEditor.ViewModels
 
         private ICommand? _selectToolCommand;
 
+        /// <summary>
+        /// Выбирает инструмент.
+        /// </summary>
         public ICommand SelectToolCommand => _selectToolCommand ??= new RelayCommand(async f =>
         {
             if (f is ToolType toolType) SelectedTool = toolType;
@@ -498,6 +563,9 @@ namespace MapEditor.ViewModels
 
         private ICommand? _createMapElementCommand;
 
+        /// <summary>
+        /// Создает объект на карте.
+        /// </summary>
         public ICommand CreateMapElementCommand => _createMapElementCommand ??= new RelayCommand(async f =>
         {
             if (f is not MouseEventArgs mouseArgs) return;
@@ -529,7 +597,9 @@ namespace MapEditor.ViewModels
         });
 
         private ICommand? _editAreaCommand;
-
+        /// <summary>
+        /// Начинает редактирование области на карте.
+        /// </summary>
         public ICommand EditAreaCommand => _editAreaCommand ??= new RelayCommand(async f =>
         {
             if(f is not VisualArea va) return;
@@ -547,6 +617,9 @@ namespace MapEditor.ViewModels
 
         private ICommand? _deleteMapElementCommand;
 
+        /// <summary>
+        /// Удаляет объект на карте.
+        /// </summary>
         public ICommand DeleteMapElementCommand => _deleteMapElementCommand ??= new RelayCommand(async f =>
         {
             if (f is MapElement me)
@@ -583,6 +656,9 @@ namespace MapEditor.ViewModels
 
         private ICommand? _linkNodesCommand;
 
+        /// <summary>
+        /// Связывает точки на карте.
+        /// </summary>
         public ICommand LinkNodesCommand => _linkNodesCommand ??= new RelayCommand(async f =>
         {
             if (!Keyboard.IsKeyDown(Key.LeftShift) && !Keyboard.IsKeyDown(Key.RightShift)) return;
@@ -623,6 +699,10 @@ namespace MapEditor.ViewModels
 
         private ICommand? _finishAreaCommand;
 
+        /// <summary>
+        /// Завершает редактирование области на карте.
+        /// </summary>
+
         public ICommand FinishAreaCommand => _finishAreaCommand ??= new RelayCommand(async f =>
         {
             var res= await CreatingArea.StopEditing();
@@ -640,6 +720,9 @@ namespace MapEditor.ViewModels
 
         private ICommand? _dragCommand;
 
+        /// <summary>
+        /// Начинает перетягивание элемента карты.
+        /// </summary>
         public ICommand DragCommand => _dragCommand ??= new RelayCommand(async f =>
         {
             if(f is not MouseButtonEventArgs e) return;
@@ -683,6 +766,9 @@ namespace MapEditor.ViewModels
 
         private ICommand? _makeRouteCommand;
 
+        /// <summary>
+        /// Рисует маршрут между двумя точками.
+        /// </summary>
         public ICommand MakeRouteCommand => _makeRouteCommand ??= new RelayCommand(async f =>
         {
             if(SelectedTool!=ToolType.Route) return;
@@ -711,6 +797,10 @@ namespace MapEditor.ViewModels
         });
 
         private ICommand? _onLoaded;
+
+        /// <summary>
+        /// Загрузка UI.
+        /// </summary>
         public ICommand OnLoaded => _onLoaded ??= new RelayCommand(f =>
         {
             if(f is ItemsControl mainItemsControl) MainItemsControl = mainItemsControl;
@@ -718,6 +808,9 @@ namespace MapEditor.ViewModels
 
         private ICommand? _openSettingsCommand;
 
+        /// <summary>
+        /// Открывает окно настроек.
+        /// </summary>
         public ICommand OpenSettingsCommand => _openSettingsCommand ??= new RelayCommand(f =>
         {
             var settingsWindow = new SettingsWindow
@@ -726,6 +819,7 @@ namespace MapEditor.ViewModels
             settingsWindow.Show();
         });
 
+        
         private async void SettingsWindow_Closed(object? sender, EventArgs e)
         {
             _settingsManager.Write(Settings);
@@ -756,6 +850,9 @@ namespace MapEditor.ViewModels
         }
 
         private ICommand? _openHelpWindowCommand;
+        /// <summary>
+        /// Открывает окно справки.
+        /// </summary>
         public ICommand OpenHelpWindowCommand => _openHelpWindowCommand ??= new RelayCommand(f =>
         {
             var window = new HelpWindow();

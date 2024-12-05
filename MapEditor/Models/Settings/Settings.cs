@@ -2,6 +2,9 @@
 
 namespace MapEditor.Models.Settings
 {
+    /// <summary>
+    /// Модель настроек.
+    /// </summary>
     public class Settings:ObservableObject
     {
 

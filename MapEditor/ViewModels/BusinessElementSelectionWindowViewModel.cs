@@ -16,12 +16,18 @@ using WebApiNET;
 
 namespace MapEditor.ViewModels
 {
-
+    /// <summary>
+    /// Тип отвязываемого объекта карты.
+    /// </summary>
     public enum ClearType
     {
         Node,
         Area
     }
+
+    /// <summary>
+    /// Класс бизнес-логики окна связывания объектов карты с областями картами.
+    /// </summary>
     public class BusinessElementSelectionWindowViewModel : ObservableObject
     {
         public ObservableCollection<BusinessEntity> BusinessEntities
@@ -64,6 +70,10 @@ namespace MapEditor.ViewModels
             set => SetAndNotify(value);
         }
 
+
+        /// <summary>
+        /// Связывает элемент карты с сущностью.
+        /// </summary>
         private async void AddMapElementToBusinessElement(BusinessElement businessElement, MapElement mapElement)
         {
             var entity = BusinessEntities.FirstOrDefault(item => item.BusinessElements.Contains(businessElement));
@@ -91,6 +101,9 @@ namespace MapEditor.ViewModels
             else NotificationService.AddNotification("Связь не была добавлена из-за ошибки на сервере", NotificationType.Failure);
         }
 
+        /// <summary>
+        /// Отвязывает элемент карты от сущности.
+        /// </summary>
         private async void ClearBusinessElement(BusinessElement businessElement, ClearType clearType)
         {
             var entity = BusinessEntities.FirstOrDefault(item => item.BusinessElements.Contains(businessElement));
@@ -170,7 +183,9 @@ namespace MapEditor.ViewModels
         }, f => SelectedBusinessElement is not null);
 
         private ICommand? _searchCommand;
-
+        /// <summary>
+        /// Поиск по индексируемым полям сущностей.
+        /// </summary>
         public ICommand SearchCommand => _searchCommand ??= new RelayCommand(f =>
         {
             if(f is not string text) return;

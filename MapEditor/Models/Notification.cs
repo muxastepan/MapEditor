@@ -7,14 +7,27 @@ using System.Windows.Threading;
 
 namespace MapEditor.Models
 {
+    /// <summary>
+    /// Тип оповещения.
+    /// </summary>
     public enum NotificationType
     {
         Success,
         Failure,
         Warning
     }
+
+    /// <summary>
+    /// Класс оповещения.
+    /// </summary>
     public class Notification
     {
+        /// <summary>
+        /// Конструктор класса оповещений.
+        /// </summary>
+        /// <param name="message">Текст оповещения</param>
+        /// <param name="type">Тип оповещения</param>
+        /// <param name="lifeTime">Время отображения оповещения</param>
         public Notification(string message, NotificationType type, int lifeTime)
         {
             Message = message;

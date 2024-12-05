@@ -7,6 +7,10 @@ using MapEditor.Models.BusinessEntities;
 
 namespace MapEditor.Models.MapElements.BindingMapElements
 {
+    /// <summary>
+    /// Базовый класс для элементов UI, имеющих функционал связывания.
+    /// </summary>
+    /// <inheritdoc cref="MapElement"/>
     public abstract class BindingMapElement : MapElement
     {
         public bool IsLinked
